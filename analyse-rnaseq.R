@@ -44,53 +44,7 @@ source("CombinedCode.R")
 source("DESEQ2Code.R")
 source("edgeRCode.R")
 
-analyse.RNAseq <- function (project.folder,analysis, group) {
-
-    biocManagerLibs <- c("edgeR",
-                         "limma",
-                         "pcaMethods",
-                         "DESeq2",
-                         "biomaRt",
-                         "Rgraphviz",
-                         "topGO")
-    libs            <- c("seqinr",
-                         "car",
-                         "data.table",
-                         "ggalluvial",
-                         "ggplot2",
-                         "ggrepel",
-                         "ggthemes",
-                         "GO.db",
-                         "gplots",
-                         "grid",
-                         "lattice",
-                         "parallel",
-                         "pheatmap",
-                         "plyr",
-                         "RColorBrewer",
-                         "reshape2",
-                         "scales",
-                         "scatterplot3d",
-                         "statmod",
-                         "tidytext",
-                         "tidyverse",
-                         "viridis",
-                         "wesanderson",
-                         "devtools",
-                         "data.table")
-
-    lfc.suffixes <- data.frame(
-     Level = c(0,1.5,2),
-     Suffix = c("_detags.csv",
-                "_detags_1point5FC.csv",
-                "_detags_2FC.csv"
-     )
-    )
-
-    source("rewrittenHonoursCode.R")
-    source("CombinedCode.R")
-    source("DESEQ2Code.R")
-    source("edgeRCode.R")
+analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
 
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
