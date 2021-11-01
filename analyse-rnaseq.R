@@ -20,7 +20,7 @@ text_size_theme_8_labels <- theme(axis.text=element_text(size=8),
 # https://stackoverflow.com/questions/17311917/ggplot2-the-unit-of-size
 label_size = 25.4/72 * 8
 
-analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_path) {
+analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
