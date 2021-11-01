@@ -40,7 +40,7 @@ file_paths <- function(project.folder,analysis) {
   ))
 
   paths <- c(paths, paste0(
-    paths[1],
+    project.folder,
     "/keyfile.csv"
   ))
 
