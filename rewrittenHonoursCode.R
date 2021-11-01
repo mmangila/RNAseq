@@ -28,10 +28,7 @@ file_paths <- function(project.folder,analysis) {
     "%Y-%m-%d-%H%M"
   )
 
-  paths <- c(paths, paste0(
-    paths[1],
-    "/featureCounts"
-  ))
+  paths <- c(paths, readline("Enter the location of your featureCounts results here: "))
 
   paths <- c(paths, paste0(
     paths[1],
