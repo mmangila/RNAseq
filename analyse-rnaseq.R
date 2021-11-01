@@ -35,6 +35,28 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_pa
                          "devtools",
                          "data.table")
 
+    text_size_theme_8 <- theme(axis.text=element_text(size=8),
+        axis.title=element_text(size=8),
+        axis.text.x=element_text(angle = 45, hjust = 1),
+        legend.title=element_text(size=8),
+        legend.text=element_text(size=8))
+
+    # text sizes
+    text_size_theme_8_labels <- theme(axis.text=element_text(size=8),
+           axis.title=element_text(size=8),
+           axis.text.x=element_text(angle = 45, hjust = 1),
+           legend.title=element_text(size=8),
+           legend.text=element_text(size=8),
+           panel.background = element_rect(fill = "transparent") # bg of the panel
+       , plot.background = element_rect(fill = "transparent", color = NA) # bg of the plot
+       , panel.grid.major = element_blank() # get rid of major grid
+       , panel.grid.minor = element_blank() # get rid of minor grid
+       , legend.background = element_rect(fill = "transparent") # get rid of legend bg
+       , legend.box.background = element_rect(fill = "transparent")) # get rid of legend panel bg
+    # magic geom_text conversion ratio
+    # https://stackoverflow.com/questions/17311917/ggplot2-the-unit-of-size
+    label_size = 25.4/72 * 8
+
     lfc.suffixes <- data.frame(
      Level = c(0,1.5,2),
      Suffix = c("_detags.csv",
