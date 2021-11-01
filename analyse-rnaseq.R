@@ -49,7 +49,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
 
-    project_paths <- file_paths(project.folder,analysis,func_path)
+    project_paths <- file_paths(project.folder,analysis)
     keyfile <- create.folders(project_paths)
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
