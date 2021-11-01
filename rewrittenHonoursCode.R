@@ -52,6 +52,14 @@ file_paths <- function(project.folder,analysis) {
 
 ## Summary of reads assigned to features by featureCounts (after mapping)
 
+install_libraries <- function(libraries, installer) {
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+  lapply(libraries, function(x) {
+    if (!require(x, character.only = TRUE)) {do.call(installer, list(x))}
+    library(x, character.only = TRUE)
+  })
+}
 assignment.summary <- function(paths,keyfile) {
 
   #paths = project_paths
