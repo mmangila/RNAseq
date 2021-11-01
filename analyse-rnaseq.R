@@ -65,11 +65,21 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_pa
                 "_detags_2FC.csv"
      )
     )
-    source(paste0(script_path,"rewrittenHonoursCode.R"))
-    source(paste0(script_path,"CombinedCode.R"))
-    source(paste0(script_path,"DESEQ2Code.R"))
-    source(paste0(script_path,"edgeRCode.R"))
-    devtools::source_url("https://github.com/pedrocrisp/NGS-pipelines/raw/master/R_functions/MAplotGeneSetLimma.R")
+    devtools::source_url(
+      "https://github.com/mmangila/RNAseq/raw/main/CombinedCode.R"
+    )
+    devtools::source_url(
+      "https://github.com/mmangila/RNAseq/raw/main/DESEQ2Code.R"
+      )
+    devtools::source_url(
+      "https://github.com/mmangila/RNAseq/raw/main/edgeRCode.R"
+      )
+    devtools::source_url(
+      "https://github.com/mmangila/RNAseq/raw/main/rewrittenHonoursCode.R"
+      )
+    devtools::source_url(
+      "https://github.com/pedrocrisp/NGS-pipelines/raw/master/R_functions/MAplotGeneSetLimma.R"
+      )
 
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
