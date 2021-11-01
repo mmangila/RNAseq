@@ -39,10 +39,7 @@ file_paths <- function(project.folder,analysis) {
     timeStamp
   ))
 
-  paths <- c(paths, paste0(
-    project.folder,
-    "/keyfile.csv"
-  ))
+  paths <- c(paths, readline("Enter the location of the keyfile here: "))
 
   paths <- c(paths, paste0(paths[1], "/Mapping_stats"))
 
