@@ -32,6 +32,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_pa
     libs            <- c("seqinr",
                          "car",
                          "data.table",
+                         "devtools",
                          "ggalluvial",
                          "ggplot2",
                          "ggrepel",
@@ -68,6 +69,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_pa
     source(paste0(script_path,"CombinedCode.R"))
     source(paste0(script_path,"DESEQ2Code.R"))
     source(paste0(script_path,"edgeRCode.R"))
+    devtools::source_url("https://github.com/pedrocrisp/NGS-pipelines/raw/master/R_functions/MAplotGeneSetLimma.R")
 
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
@@ -79,15 +81,15 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path, script_pa
     dge.DESeq <- old.dge
 
     #edgeRCode
-
+    print("Running edgeR")
     find_de_edger(old.dge, group, keyfile, project_paths)
 
     #DESEQ2Code
-
+    print("Running DESeq2")
     find_de_deseq(dge.DESeq, keyfile, group, project_paths)
 
     # Find the union
-
+    print("Combining the analyses")
     find_combined_de(keyfile, group, lfc.suffixes, func_path, project_paths)
 
 

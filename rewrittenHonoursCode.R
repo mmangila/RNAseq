@@ -3,7 +3,7 @@
 create.folders <- function(project_paths) {
 
 
-  lapply(project_paths[-3], function (x) dir.create(x, showWarnings = FALSE))
+  lapply(project_paths, function (x) dir.create(x, showWarnings = FALSE))
   dir.create(
     paste0(project_paths[3],"/MDS"),
     showWarnings = F
@@ -206,11 +206,11 @@ filtering_step <- function(raw.counts,dge) {
     )
 
   confirm <- readline("Accept these filters? y/n ")
-  return(continue.filter(confirm, raw.counts,dge))
+  return(continue.filter(confirm, raw.counts,dge, loci.2.keep))
 
 }
 
-continue.filter <- function (confirm, raw.counts,dge) {
+continue.filter <- function (confirm, raw.counts,dge,loci.2.keep) {
   if (confirm == "y") {
     n.tags <- sum(loci.2.keep)
     old.dge <- dge

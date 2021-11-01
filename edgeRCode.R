@@ -3,13 +3,13 @@ find_de_edger <- function (old.dge, group, keyfile, paths) {
   design <- eval(parse(text = paste0('model.matrix(~0 + ',
                                      group,
                                      ', data = keyfile)')))
-  colnames(design) <- eval(parse(text = paste0("levels(keyfile$",group,")")))
+  colnames(design) <- eval(parse(text = paste0("levels(as.factor(keyfile$",group,"))")))
   v <- voom(dge,design,plot=TRUE)
   fit <- lmFit(v,design)
   fit <- eBayes(fit)
 
   print("Begin MDS")
-  de_edger_mds(dge, group, keyfile, paths)
+  de_edger_mds(dge, group, keyfile, paths, v)
   print("Begin PCA")
   de_edger_pca(v, group, keyfile, paths)
   print("Begin DE gene table generation")
@@ -17,7 +17,7 @@ find_de_edger <- function (old.dge, group, keyfile, paths) {
   de_edger_tables(keyfile, group, fit, paths, design, gene.names)
 }
 
-de_edger_mds <- function (dge, group, keyfile, paths) {
+de_edger_mds <- function (dge, group, keyfile, paths, v) {
   SampleColours <- ptol_pal()(length(dge$samples$lib.size)/2)
   if (length(dge$samples$lib.size) %% 2 == 1) {
     dddSampleColours <- c(rep(SampleColours, each=2), ptol_pal()(1))
@@ -251,8 +251,8 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names) {
   #be careful that gene.names is in the correct order...
   rownames(fc.matrix) <- gene.names
   rownames(fdr.matrix) <- gene.names
-  write.csv(fc.matrix, file=paste0(out.base, analysis.name, "_fc.csv"))
-  write.csv(fdr.matrix, file=paste0(out.base, analysis.name, "_fdr.csv"))
+  write.csv(fc.matrix, file=paste0(out.base, analysis, "_fc.csv"))
+  write.csv(fdr.matrix, file=paste0(out.base, analysis, "_fdr.csv"))
 
   tests.sig.2FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = 0.05, lfc = log2(2), number=Inf, coef=x, sort.by = "none"))
   names(tests.sig.2FC) <- coefs
@@ -261,7 +261,7 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names) {
   names(tests.sig.1.5FC) <- coefs
 
   cpm.matrix <- cpm(v)
-  write.csv(fdr.matrix, file=paste0(out.base, analysis.name, "_fdr.csv"))
+  write.csv(fdr.matrix, file=paste0(out.base, analysis, "_fdr.csv"))
 }
 
 plotMDS.invisible <- function(...){
