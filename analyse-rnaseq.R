@@ -48,7 +48,6 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
 
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
-    devtools::install_github("INWTlab/rsync")
 
     project_paths <- file_paths(project.folder,analysis,func_path)
     keyfile <- create.folders(project_paths)
