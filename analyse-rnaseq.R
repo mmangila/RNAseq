@@ -1,4 +1,4 @@
-install.packages("ggplot2")
+require("ggplot2")
 library(ggplot2)
 
 text_size_theme_8 <- theme(axis.text=element_text(size=8),
