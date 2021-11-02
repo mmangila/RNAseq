@@ -111,3 +111,7 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
 
 }
+
+convert_to_factor <- function (variable) {
+    variable <- as.factor(variable)
+    }
