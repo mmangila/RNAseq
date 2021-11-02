@@ -90,9 +90,9 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
     project_paths <- file_paths(project.folder,analysis)
     keyfile <- create.folders(project_paths)
-    keyfile[sapply(keyfile, is.character)] <- lapply(keyfile[sapply(DF, is.character)], 
+    keyfile[sapply(keyfile, is.character)] <- lapply(keyfile[sapply(keyfile, is.character)], 
                                        as.factor)
-    keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(DF, is.numeric)], 
+    keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)], 
                                        as.factor)
     func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
     assignment.summary(project_paths,keyfile)
