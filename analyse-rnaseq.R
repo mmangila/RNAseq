@@ -1,3 +1,6 @@
+install.packages("ggplot2")
+library(ggplot2)
+
 text_size_theme_8 <- theme(axis.text=element_text(size=8),
     axis.title=element_text(size=8),
     axis.text.x=element_text(angle = 45, hjust = 1),
