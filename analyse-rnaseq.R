@@ -93,6 +93,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
+    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
 
     #edgeRCode
     print("Running edgeR")
