@@ -1,5 +1,6 @@
 require("ggplot2")
 library(ggplot2)
+options(ggrepel.max.overlaps = Inf)
 
 text_size_theme_8 <- theme(axis.text=element_text(size=8),
     axis.title=element_text(size=8),
