@@ -90,7 +90,7 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
     project_paths <- file_paths(project.folder,analysis)
     keyfile <- create.folders(project_paths)
-    eval(parse(paste0("keyfile$", analysis, " = as.factor(keyfile$", analysis, ")")))
+    eval(parse(paste0("keyfile$", analysis, " <- as.factor(keyfile$", analysis, ")")))
     func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
