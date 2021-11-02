@@ -24,7 +24,7 @@ text_size_theme_8_labels <- theme(axis.text=element_text(size=8),
 # https://stackoverflow.com/questions/17311917/ggplot2-the-unit-of-size
 label_size = 25.4/72 * 8
 
-analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
+analyse.RNAseq <- function (project.folder,analysis, group) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
@@ -90,10 +90,10 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
 
     project_paths <- file_paths(project.folder,analysis)
     keyfile <- create.folders(project_paths)
+    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
-    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
 
     #edgeRCode
     print("Running edgeR")
