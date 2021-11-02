@@ -95,7 +95,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, func_path) {
 
     #edgeRCode
     print("Running edgeR")
-    find_de_edger(old.dge, group, keyfile, project_paths)
+    find_de_edger(old.dge, group, keyfile, project_paths, analysis)
 
     #DESEQ2Code
     print("Running DESeq2")
