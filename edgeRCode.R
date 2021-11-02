@@ -1,4 +1,4 @@
-find_de_edger <- function (old.dge, group, keyfile, paths) {
+find_de_edger <- function (old.dge, group, keyfile, paths, analysis) {
   dge <- calcNormFactors(old.dge, method="TMM")
   design <- eval(parse(text = paste0('model.matrix(~0 + ',
                                      group,
@@ -14,7 +14,7 @@ find_de_edger <- function (old.dge, group, keyfile, paths) {
   de_edger_pca(v, group, keyfile, paths)
   print("Begin DE gene table generation")
   gene.names <- as.character(rownames(dge$counts))
-  de_edger_tables(keyfile, group, fit, paths, design, gene.names)
+  de_edger_tables(keyfile, group, fit, paths, design, gene.names, analysis)
 }
 
 de_edger_mds <- function (dge, group, keyfile, paths, v) {
@@ -120,7 +120,7 @@ de_edger_pca <- function (v, group, keyfile, paths) {
   dev.off()
 }
 
-de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names) {
+de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, analysis) {
   combos <- eval(
     parse(
       text = paste0(
