@@ -10,7 +10,6 @@ create.folders <- function(project_paths) {
   )
 
   keyfile = read_csv(project_paths[4])
-  confirm <- readline("Remove samples? Y/N")
 
   return(keyfile)
 }
