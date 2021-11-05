@@ -115,7 +115,7 @@ find_de_intersect <- function (test.name, lfc.suffixes, y, paths) {
   return(as.vector(table(sign(final_table$edger_logFC))))
 }
 
-find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, paths) {
+find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func_focus, paths) {
 
   de_genes_summary <- as.data.frame(t(combos))
   rownames(de_genes_summary) <- paste(
@@ -195,6 +195,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, path
                                         key = names(edger_table)),
                              data.table(deseq_table,
                                         key = names(deseq_table)))
+        colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
         gene_funcs  <- funcs[which(funcs$X %in% comb_genes), ]
         final_table <- merge(data.table(gene_funcs, key = names(gene_funcs)),
@@ -218,41 +219,40 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, path
   }
 
 
+find_combined_de <- function(keyfile, group, lfc.suffixes, func_path, func_focus, paths) {
 
-  find_combined_de <- function(keyfile, group, lfc.suffixes, func_path, paths) {
+  combined.folder <- paste0(
+    paths[3],
+    "/Combined"
+  )
+  dir.create(
+    combined.folder,
+    showWarnings = FALSE
+  )
+  dir.create(
+    paste0(combined.folder,"/DE_tables/"),
+    showWarnings = FALSE
+  )
 
-    combined.folder <- paste0(
-      paths[3],
-      "/Combined"
-    )
-    dir.create(
-      combined.folder,
-      showWarnings = FALSE
-    )
-    dir.create(
-      paste0(combined.folder,"/DE_tables/"),
-      showWarnings = FALSE
-    )
-
-    combos <- eval(
-      parse(
-        text = paste0(
-          "combn(as.data.frame(keyfile %>% distinct(",
-          group,
-          "))[,1],2)"
-        )
+  combos <- eval(
+    parse(
+      text = paste0(
+        "combn(as.data.frame(keyfile %>% distinct(",
+        group,
+        "))[,1],2)"
       )
     )
+  )
 
-    funcs <- read.csv(file = func_path)
+  funcs <- read.csv(file = func_path)
 
-    sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
-    find_de_combined(combos, lfc.suffixes, combined.folder, funcs, paths)
-    sink()
-  }
+  sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
+  find_de_combined(combos, lfc.suffixes, combined.folder, funcs, func_focus, paths)
+  sink()
+}
 
-  add_gene_funcs <- function (combos, funcs) {
-    sapply(1:length(combos[1, ]), function (x) {
+add_gene_funcs <- function (combos, funcs) {
+  sapply(1:length(combos[1, ]), function (x) {
 
-    })
-  }
+  })
+}

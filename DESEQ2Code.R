@@ -1,8 +1,10 @@
 find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
+
+  print("Preparing DESEQ2 data.")
   dge.DESeq$samples$lib.size <- colSums(
     dge.DESeq$counts
   )
-  
+
   dds <- eval(parse(text = paste0(
     "DESeqDataSetFromMatrix(",
     "countData = dge.DESeq$counts,",
@@ -10,7 +12,20 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
     "design= ~ ",
     group,")"
   )))
-  
+
+  dds <- DESeq(dds)
+
+  resultsNames(dds) # lists the coefficients
+
+
+
+  print("Creating gene tables.")
+  de_deseq_tables(keyfile, group, paths)
+
+}
+
+de_deseq_tables <- function (keyfile, group, paths) {
+
   combos <- eval(
     parse(
       text = paste0(
@@ -20,18 +35,7 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
       )
     )
   )
-  
-  
-  # #Relevel factors just in case
-  # dds$Group <- relevel(
-  #   dds$Group,
-  #   ref = "Mock.Leaf.Lab"
-  # )
-  
-  dds <- DESeq(dds)
-  
-  resultsNames(dds) # lists the coefficients
-  
+
   out.base <- paste0(paths[3],
                      "/DESEQ2/DE_tables/"
   )
@@ -47,6 +51,7 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
                "_detags_2FC.csv"
     )
   )
+
   sapply(1:length(combos[1,]), function (x) {
     test.name <- paste0(
       combos[1,x],
@@ -56,7 +61,7 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
     test.base.dir <- paste0(out.base,
                             test.name,
                             "/")
-    dir.create(test.base.dir, showWarnings=F)    
+    dir.create(test.base.dir, showWarnings=F)
     de.genes  <- results(
       dds,
       contrast = c(group,
@@ -66,14 +71,14 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
       alpha = 0.99999
     )
     de.genes$X <- rownames(de.genes)
-    
+
     write_csv(as.data.frame(de.genes),
               file = paste0(test.base.dir,
                             test.name,
                             "_alltags.csv"
               )
     )
-    
+
     sapply(1:3, function (x) {
       de.genes.sigs <- filter.de.set(
         de.genes,
@@ -86,7 +91,6 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
                               lfc.suffixes[x,2]))
     })
   })
- 
 }
 
 
@@ -97,6 +101,6 @@ filter.de.set <- function(deset, lfc = 0, padj = 0.05) {
         deset$padj < padj
     ),
     ]
-  
+
   return(filtered.de.set)
 }

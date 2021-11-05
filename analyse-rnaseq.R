@@ -90,11 +90,13 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
     project_paths <- file_paths(project.folder,analysis)
     keyfile <- create.folders(project_paths)
-    keyfile[sapply(keyfile, is.character)] <- lapply(keyfile[sapply(keyfile, is.character)], 
+    keyfile[sapply(keyfile, is.character)] <- lapply(keyfile[sapply(keyfile, is.character)],
                                        as.factor)
-    keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)], 
+    keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)],
                                        as.factor)
-    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv):")
+    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
+    func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
+
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
@@ -109,7 +111,7 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
     # Find the union
     print("Combining the analyses")
-    find_combined_de(keyfile, group, lfc.suffixes, func_path, project_paths)
+    find_combined_de(keyfile, group, lfc.suffixes, func_path, func_focus, project_paths)
 
 
 
