@@ -10,6 +10,7 @@ create.folders <- function(project_paths) {
   )
 
   keyfile = read_csv(project_paths[4])
+  confirm <- readline("Remove samples? Y/N")
 
   return(keyfile)
 }
@@ -72,6 +73,8 @@ assignment.summary <- function(paths,keyfile) {
       )
     )
 
+  sample_num <- length(as.data.frame(keyfile)[,1])
+
 
   FCS            <- data.frame(t(FCS))
   row.names(FCS) <- as.data.frame(keyfile)[,1]
@@ -84,7 +87,9 @@ assignment.summary <- function(paths,keyfile) {
 
   plot.data      <- prop.plot
 
-  plot_colours   <- rev(c("black", "grey", viridis_pal(option = "C")(n=12)))
+  plot_colours   <- rev(
+    c("black", "grey", viridis_pal(option = "C")(n=sample_num))
+    )
 
   pdf(paste0(paths[5], "/percent_mapped_plot.pdf"), w = 8, h = 4)
   print(ggplot(plot.data, aes(x=Var1, y=rev(value), fill=rev(Var2))) +
@@ -160,21 +165,22 @@ filter.wrapper <- function (keyfile,group,paths) {
 
 filtering_step <- function(raw.counts,dge) {
 
-  boxplot(colSums(raw.counts[,1:12]))
+  sample_num <- length(dge$samples[,1])
+  boxplot(colSums(raw.counts[,1:sample_num]))
 
   #42604 genes have at least 1 count
   print("Table of genes with at least one count:")
-  print(table(rowSums(raw.counts[,1:12])>0))
+  print(table(rowSums(raw.counts[,1:sample_num])>0))
 
   #39728 genes have at least 1 count in 2 samples
   print("Table of genes with at least 1 count in 2 samples")
-  print(table(rowSums((raw.counts[,1:12])>0)>2))
+  print(table(rowSums((raw.counts[,1:sample_num])>0)>2))
 
   #histogram of number of samples having 1 or more counts per gene
-  hist(rowSums((raw.counts[,1:12])>0), breaks = 100)
+  hist(rowSums((raw.counts[,1:sample_num])>0), breaks = 100)
 
   #histogram of reads per gene
-  hist(log10(rowSums(raw.counts[,1:12])), breaks = 100)
+  hist(log10(rowSums(raw.counts[,1:sample_num])), breaks = 100)
 
   min.reads <- readline("Set number of minimum Count per Million: ")
   min.samples <- readline("Set number of minimum samples with minimum reads: ")
@@ -192,7 +198,7 @@ filtering_step <- function(raw.counts,dge) {
         raw.counts[
           which(rownames(raw.counts) %in%
                   names(which(loci.2.keep == TRUE))),
-          1:12
+          1:sample_num
           ]
         )
       ),
