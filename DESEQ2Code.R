@@ -20,11 +20,11 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
 
 
   print("Creating gene tables.")
-  de_deseq_tables(keyfile, group, paths)
+  de_deseq_tables(keyfile, group, dds, paths)
 
 }
 
-de_deseq_tables <- function (keyfile, group, paths) {
+de_deseq_tables <- function (keyfile, group, dds, paths) {
 
   combos <- eval(
     parse(
