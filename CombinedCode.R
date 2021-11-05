@@ -17,11 +17,11 @@ find_all_de <- function () {
     )
   )
 
-  de_genes_summary <- as.data.frame(t(combos))
+  de_genes_summary <- t(combos)
   rownames(de_genes_summary) <- paste(
-    de_genes_summary$V1,
+    de_genes_summary[,1],
     "vs",
-    de_genes_summary$V2,
+    de_genes_summary[,1],
     sep = "."
   )
 }
