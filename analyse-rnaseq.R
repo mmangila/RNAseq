@@ -94,7 +94,7 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
                                        as.factor)
     keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)],
                                        as.factor)
-    colnames(keyfile)[1] <- Sample_ID
+    colnames(keyfile)[1] <- "Sample_ID"
     func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
     func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
 
