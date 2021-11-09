@@ -119,9 +119,9 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
 
   de_genes_summary <- t(combos)
   rownames(de_genes_summary) <- paste(
-    de_genes_summary$V1,
+    de_genes_summary[,1],
     "vs",
-    de_genes_summary$V2,
+    de_genes_summary[,2],
     sep = "."
   )
 
