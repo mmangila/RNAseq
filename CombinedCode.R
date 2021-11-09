@@ -117,7 +117,7 @@ find_de_intersect <- function (test.name, lfc.suffixes, y, paths) {
 
 find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func_focus, paths) {
 
-  de_genes_summary <- as.data.frame(t(combos))
+  de_genes_summary <- t(combos)
   rownames(de_genes_summary) <- paste(
     de_genes_summary$V1,
     "vs",
