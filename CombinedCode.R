@@ -180,13 +180,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                        lfc.suffixes[y,2]))$X
 
         if ("try-error" %in% class(edger_genes)) {
-          edger_genes <- data.frame(X = character(),
-                                    logFC = numeric(),
-                                    AveExpr = numeric(),
-                                    t = numeric(),
-                                    P.Value = numeric(),
-                                    adj.P.Val = numeric(),
-                                    B = numeric())
+          edger_genes <- vector()
         }
 
         deseq_genes <- read.csv(paste0(paths[3],
@@ -197,13 +191,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                        lfc.suffixes[y,2]))$X
 
          if ("try-error" %in% class(deseq_genes)) {
-           deseq_genes <- data.frame(X = character(),
-                                     logFC = numeric(),
-                                     AveExpr = numeric(),
-                                     t = numeric(),
-                                     P.Value = numeric(),
-                                     adj.P.Val = numeric(),
-                                     B = numeric())
+           deseq_genes <- vector()
          }
 
         if (length(edger_genes[,1]) == 0 && length(deseq_genes[,1]) == 0) {
@@ -213,11 +201,13 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
           " with a fold change greater than ",
           lfc.suffixes[y,1], "."
         ))
-        } else if (length(edger_genes[,1]) == 0 || length(deseq_genes[,1]) == 0) {
-          comb_genes <-
+        } else if (length(edger_genes[,1]) == 0) {
+          comb_genes <- deseq_genes
+        } else if (length(deseq_genes[,1]) == 0) {
+          comb_genes <- edger_genes
+        } else {
+          comb_genes <- union(edger_genes,deseq_genes)
         }
-        comb_genes <- union(edger_genes,deseq_genes)
-
         edger_table <- edger.deset[which(edger.deset$X %in% comb_genes),]
         deseq_table <- deseq.deset[which(deseq.deset$X %in% comb_genes),]
 
