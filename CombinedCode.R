@@ -172,23 +172,23 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
           lfc.suffixes[y,1], "."
         ))
 
-        edger_genes <- read.csv(paste0(paths[3],
+        edger_genes <- try(read.csv(paste0(paths[3],
                                        "/edgeR/DE_tables/",
                                        test.name,
                                        "/",
                                        test.name,
-                                       lfc.suffixes[y,2]))$X
+                                       lfc.suffixes[y,2]))$X)
 
         if ("try-error" %in% class(edger_genes)) {
           edger_genes <- vector()
         }
 
-        deseq_genes <- read.csv(paste0(paths[3],
+        deseq_genes <- try(read.csv(paste0(paths[3],
                                        "/DESEQ2/DE_tables/",
                                        test.name,
                                        "/",
                                        test.name,
-                                       lfc.suffixes[y,2]))$X
+                                       lfc.suffixes[y,2]))$X)
 
          if ("try-error" %in% class(deseq_genes)) {
            deseq_genes <- vector()
@@ -223,8 +223,8 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                           )]
                                   %in% comb_genes),
                               ]
-        final_table <- merge(data.table(gene_funcs, key = names(gene_funcs)),
-                             data.table(gene_table, key = names(gene_table)))
+        final_table <- try(merge(data.table(gene_funcs, key = names(gene_funcs)),
+                             data.table(gene_table, key = names(gene_table))))
 
         if ("try-error" %in% class(final_table)) {
           final_table <- data.frame(X = character(),
