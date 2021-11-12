@@ -197,7 +197,12 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                         key = names(deseq_table)))
         colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
-        gene_funcs  <- funcs[which(funcs$X %in% comb_genes), ]
+        gene_funcs  <- funcs[which(funcs[,
+                                         which(
+                                          colnames(gene_table) == func_focus
+                                          )]
+                                  %in% comb_genes),
+                              ]
         final_table <- merge(data.table(gene_funcs, key = names(gene_funcs)),
                              data.table(gene_table, key = names(gene_table)))
 
