@@ -101,7 +101,7 @@ de_deseq_pca <- function (dds, group, paths) {
   print(percentVar)
 
   pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA_all_labels.pdf"), width = 5, height = 3.5)
-  ggplot(
+  print(ggplot(
     pcaData,
     aes(PC1, PC2, color=group)
     ) +
@@ -112,11 +112,11 @@ de_deseq_pca <- function (dds, group, paths) {
     ylab(
       paste0("PC2: ",percentVar[2],"% variance")
       ) +
-    geom_text_repel(aes(label = name))
+    geom_text_repel(aes(label = name)))
   dev.off()
 
   pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA.pdf"), width = 5, height = 3.5)
-  ggplot(
+  print(ggplot(
     pcaData,
     aes(PC1, PC2, color=group)
     ) +
@@ -126,7 +126,7 @@ de_deseq_pca <- function (dds, group, paths) {
       ) +
     ylab(
       paste0("PC2: ",percentVar[2],"% variance")
-      )
+      ))
   dev.off()
 }
 
