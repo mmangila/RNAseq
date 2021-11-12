@@ -17,8 +17,8 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
 
   resultsNames(dds) # lists the coefficients
 
-
-
+  print("Begin PCA")
+  de_deseq_pca(dds, group, paths)
   print("Creating gene tables.")
   de_deseq_tables(keyfile, group, dds, paths)
 
@@ -93,10 +93,10 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
   })
 }
 
-deseq_pca <- function (dds, group, paths) {
+de_deseq_pca <- function (dds, group, paths) {
   vsd <- vst(dds, blind=FALSE)
   head(assay(vsd), 3)
-  pcaData <- plotPCA(vsd, intgroup=c("tissue3","Leaf"), returnData = TRUE)
+  pcaData <- plotPCA(vsd, intgroup=c(group), returnData = TRUE)
 
   pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA_all_labels.pdf"), width = 5, height = 3.5)
 ggplot(
