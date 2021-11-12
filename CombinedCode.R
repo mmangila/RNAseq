@@ -236,7 +236,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                     B = numeric())
         }
 
-        if (final_table[,1] > 0) {
+        if (length(final_table[,1]) > 0) {
         write_csv(
           final_table,
           file = paste0(combined.folder,
