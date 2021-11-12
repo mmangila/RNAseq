@@ -194,16 +194,16 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
            deseq_genes <- vector()
          }
 
-        if (length(edger_genes[,1]) == 0 && length(deseq_genes[,1]) == 0) {
+        if (length(edger_genes) == 0 && length(deseq_genes) == 0) {
         print(paste0(
           "Found no differentially expressed genes in ",
           test.name,
           " with a fold change greater than ",
           lfc.suffixes[y,1], "."
         ))
-        } else if (length(edger_genes[,1]) == 0) {
+        } else if (length(edger_genes) == 0) {
           comb_genes <- deseq_genes
-        } else if (length(deseq_genes[,1]) == 0) {
+        } else if (length(deseq_genes) == 0) {
           comb_genes <- edger_genes
         } else {
           comb_genes <- union(edger_genes,deseq_genes)
