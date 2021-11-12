@@ -262,6 +262,14 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                          ]
     final_table <- try(merge(data.table(gene_funcs, key = names(gene_funcs)),
                              data.table(gene_table, key = names(gene_table))))
+     write_csv(
+       final_table,
+       file = paste0(combined.folder,
+                     "/DE_tables/",
+                     test.name,
+                     "/",
+                     test.name,
+                     "_alltags.csv"))
 
   })
 }
