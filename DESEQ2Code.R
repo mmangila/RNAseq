@@ -93,6 +93,41 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
   })
 }
 
+deseq_pca <- function (dds, group, paths) {
+  vsd <- vst(dds, blind=FALSE)
+  head(assay(vsd), 3)
+  pcaData <- plotPCA(vsd, intgroup=c("tissue3","Leaf"), returnData = TRUE)
+
+  pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA_all_labels.pdf"), width = 5, height = 3.5)
+ggplot(
+  pcaData,
+  aes(PC1, PC2, color=tissue3)
+  ) +
+  geom_point(size=3) +
+  xlab(
+    paste0("PC1: ",percentVar[1],"% variance")
+    ) +
+  ylab(
+    paste0("PC2: ",percentVar[2],"% variance")
+    ) +
+  geom_text_repel(aes(label = name))
+  dev.off()
+
+  pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA.pdf"), width = 5, height = 3.5)
+  ggplot(
+    pcaData,
+    aes(PC1, PC2, color=tissue3)
+    ) +
+    geom_point(size=3) +
+    xlab(
+      paste0("PC1: ",percentVar[1],"% variance")
+      ) +
+    ylab(
+      paste0("PC2: ",percentVar[2],"% variance")
+      )
+  dev.off()
+}
+
 
 filter.de.set <- function(deset, lfc = 0, padj = 0.05) {
   filtered.de.set <- deset[
