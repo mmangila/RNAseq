@@ -95,9 +95,10 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
 
 de_deseq_pca <- function (dds, group, paths) {
   vsd <- vst(dds, blind=FALSE)
-  head(assay(vsd), 3)
+  print(head(assay(vsd), 3))
   pcaData <- plotPCA(vsd, intgroup=c(group), returnData = TRUE)
   percentVar <- round(100 * attr(pcaData, "percentVar"))
+  print(percentVar)
 
   pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA_all_labels.pdf"), width = 5, height = 3.5)
 ggplot(
