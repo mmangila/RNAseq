@@ -179,6 +179,16 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                        test.name,
                                        lfc.suffixes[y,2]))$X
 
+        if ("try-error" %in% class(edger_genes)) {
+          edger_genes <- data.frame(X = character(),
+                                    logFC = numeric(),
+                                    AveExpr = numeric(),
+                                    t = numeric(),
+                                    P.Value = numeric(),
+                                    adj.P.Val = numeric(),
+                                    B = numeric())
+        }
+
         deseq_genes <- read.csv(paste0(paths[3],
                                        "/DESEQ2/DE_tables/",
                                        test.name,
@@ -186,6 +196,26 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
                                        test.name,
                                        lfc.suffixes[y,2]))$X
 
+         if ("try-error" %in% class(deseq_genes)) {
+           deseq_genes <- data.frame(X = character(),
+                                     logFC = numeric(),
+                                     AveExpr = numeric(),
+                                     t = numeric(),
+                                     P.Value = numeric(),
+                                     adj.P.Val = numeric(),
+                                     B = numeric())
+         }
+
+        if (length(edger_genes[,1]) == 0 && length(deseq_genes[,1]) == 0) {
+        print(paste0(
+          "Found no differentially expressed genes in ",
+          test.name,
+          " with a fold change greater than ",
+          lfc.suffixes[y,1], "."
+        ))
+        } else if (length(edger_genes[,1]) == 0 || length(deseq_genes[,1]) == 0) {
+          comb_genes <-
+        }
         comb_genes <- union(edger_genes,deseq_genes)
 
         edger_table <- edger.deset[which(edger.deset$X %in% comb_genes),]
@@ -206,6 +236,17 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
         final_table <- merge(data.table(gene_funcs, key = names(gene_funcs)),
                              data.table(gene_table, key = names(gene_table)))
 
+        if ("try-error" %in% class(final_table)) {
+          final_table <- data.frame(X = character(),
+                                    logFC = numeric(),
+                                    AveExpr = numeric(),
+                                    t = numeric(),
+                                    P.Value = numeric(),
+                                    adj.P.Val = numeric(),
+                                    B = numeric())
+        }
+
+        if (final_table[,1] > 0) {
         write_csv(
           final_table,
           file = paste0(combined.folder,
@@ -218,6 +259,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
 
 
         print(table(sign(final_table$edger_logFC)))
+        }
       })
 
     })
