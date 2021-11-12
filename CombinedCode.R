@@ -165,78 +165,78 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
     sapply(1:3, function (y) {
 
 
-        print(paste0(
-          "Finding differentially expressed genes in ",
-          test.name,
-          " with a fold change greater than ",
-          lfc.suffixes[y,1], "."
-        ))
+      print(paste0(
+        "Finding differentially expressed genes in ",
+        test.name,
+        " with a fold change greater than ",
+        lfc.suffixes[y,1], "."
+      ))
 
-        edger_genes <- try(read.csv(paste0(paths[3],
-                                       "/edgeR/DE_tables/",
-                                       test.name,
-                                       "/",
-                                       test.name,
-                                       lfc.suffixes[y,2]))$X)
+      edger_genes <- try(read.csv(paste0(paths[3],
+                                         "/edgeR/DE_tables/",
+                                         test.name,
+                                         "/",
+                                         test.name,
+                                         lfc.suffixes[y,2]))$X)
 
-        if ("try-error" %in% class(edger_genes)) {
-          edger_genes <- vector()
-        }
+      if ("try-error" %in% class(edger_genes)) {
+        edger_genes <- vector()
+      }
 
-        deseq_genes <- try(read.csv(paste0(paths[3],
-                                       "/DESEQ2/DE_tables/",
-                                       test.name,
-                                       "/",
-                                       test.name,
-                                       lfc.suffixes[y,2]))$X)
+      deseq_genes <- try(read.csv(paste0(paths[3],
+                                         "/DESEQ2/DE_tables/",
+                                         test.name,
+                                         "/",
+                                         test.name,
+                                         lfc.suffixes[y,2]))$X)
 
-         if ("try-error" %in% class(deseq_genes)) {
-           deseq_genes <- vector()
-         }
+      if ("try-error" %in% class(deseq_genes)) {
+        deseq_genes <- vector()
+      }
 
-        if (length(edger_genes) == 0 && length(deseq_genes) == 0) {
+      if (length(edger_genes) == 0 && length(deseq_genes) == 0) {
         print(paste0(
           "Found no differentially expressed genes in ",
           test.name,
           " with a fold change greater than ",
           lfc.suffixes[y,1], "."
         ))
-        } else if (length(edger_genes) == 0) {
-          comb_genes <- deseq_genes
-        } else if (length(deseq_genes) == 0) {
-          comb_genes <- edger_genes
-        } else {
-          comb_genes <- union(edger_genes,deseq_genes)
-        }
-        edger_table <- edger.deset[which(edger.deset$X %in% comb_genes),]
-        deseq_table <- deseq.deset[which(deseq.deset$X %in% comb_genes),]
+      } else if (length(edger_genes) == 0) {
+        comb_genes <- deseq_genes
+      } else if (length(deseq_genes) == 0) {
+        comb_genes <- edger_genes
+      } else {
+        comb_genes <- union(edger_genes,deseq_genes)
+      }
+      edger_table <- edger.deset[which(edger.deset$X %in% comb_genes),]
+      deseq_table <- deseq.deset[which(deseq.deset$X %in% comb_genes),]
 
-        gene_table  <- merge(data.table(edger_table,
-                                        key = names(edger_table)),
-                             data.table(deseq_table,
-                                        key = names(deseq_table)))
-        colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
+      gene_table  <- merge(data.table(edger_table,
+                                      key = names(edger_table)),
+                           data.table(deseq_table,
+                                      key = names(deseq_table)))
+      colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
-        gene_funcs  <- funcs[which(funcs[,
-                                         which(
-                                          colnames(gene_table) == func_focus
-                                          )]
-                                  %in% comb_genes),
-                              ]
-        final_table <- try(merge(data.table(gene_funcs, key = names(gene_funcs)),
-                             data.table(gene_table, key = names(gene_table))))
+      gene_funcs  <- funcs[which(funcs[,
+                                       which(
+                                         colnames(gene_table) == func_focus
+                                       )]
+                                 %in% comb_genes),
+                           ]
+      final_table <- try(merge(data.table(gene_funcs, key = names(gene_funcs)),
+                               data.table(gene_table, key = names(gene_table))))
 
-        if ("try-error" %in% class(final_table)) {
-          final_table <- data.frame(X = character(),
-                                    logFC = numeric(),
-                                    AveExpr = numeric(),
-                                    t = numeric(),
-                                    P.Value = numeric(),
-                                    adj.P.Val = numeric(),
-                                    B = numeric())
-        }
+      if ("try-error" %in% class(final_table)) {
+        final_table <- data.frame(X = character(),
+                                  logFC = numeric(),
+                                  AveExpr = numeric(),
+                                  t = numeric(),
+                                  P.Value = numeric(),
+                                  adj.P.Val = numeric(),
+                                  B = numeric())
+      }
 
-        if (length(final_table[,1]) > 0) {
+      if (length(final_table[,1]) > 0) {
         write_csv(
           final_table,
           file = paste0(combined.folder,
@@ -249,11 +249,22 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
 
 
         print(table(sign(final_table$edger_logFC)))
-        }
-      })
-
+      }
     })
-  }
+    gene_table <- try(merge(data.table(edger.deset, key = names(edger.deset)),
+                             data.table(deseq.deset, key = names(deseq.deset))))
+    colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
+    gene_funcs  <- funcs[which(funcs[,
+                                     which(
+                                       colnames(gene_table) == func_focus
+                                     )]
+                               %in% union(deseq.deset$X,edger.deset$X)),
+                         ]
+    final_table <- try(merge(data.table(gene_funcs, key = names(gene_funcs)),
+                             data.table(gene_table, key = names(gene_table))))
+
+  })
+}
 
 
 find_combined_de <- function(keyfile, group, lfc.suffixes, func_path, func_focus, paths) {
