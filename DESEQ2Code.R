@@ -66,17 +66,15 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
       dds,
       contrast = c(group,
                    as.character(combos[1,x]),
-                   as.character(combos[2,x])
-      ),
+                   as.character(combos[2,x])),
       alpha = 0.99999
     )
     de.genes <- lfcShrink(dds,
-                          coef = paste0(group, "_",
-                                       as.character(combos[2,x]), "_vs_",
-                                       as.character(combos[1,x])
-                          ),
+                          contrast = c(group,
+                            as.character(combos[1,x]),
+                            as.character(combos[2,x])),
                           res = de.genes,
-                          type="apeglm")
+                          type="ashr")
     de.genes$X <- rownames(de.genes)
 
     write_csv(as.data.frame(de.genes),
@@ -87,8 +85,8 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
     )
 
     pdf(paste0(test.base.dir,test.name,"_volcano.pdf"), width = 5, height = 3.5)
-      print(EnhancedVolcano(res,
-                            lab = rownames(res),
+      print(EnhancedVolcano(de.genes,
+                            lab = rownames(de.genes),
                             x = 'log2FoldChange',
                             y = 'pvalue'))
     dev.off()
