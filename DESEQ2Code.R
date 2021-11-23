@@ -93,7 +93,7 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
               )
     )
 
-    pdf(paste0(test.base.dir,test.name,"_volcano.pdf", width = 5, height = 3.5)
+    pdf(paste0(test.base.dir,test.name,"_volcano.pdf"), width = 5, height = 3.5)
       print(EnhancedVolcano(res,
                             lab = rownames(res),
                             x = 'log2FoldChange',
