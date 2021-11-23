@@ -87,7 +87,7 @@ assignment.summary <- function(paths,keyfile) {
   plot.data      <- prop.plot
 
   plot_colours   <- rev(
-    c("black", "grey", viridis_pal(option = "C")(n=sample_num))
+    c("black", "grey", viridis_pal(option = "C")(n=12))
     )
 
   pdf(paste0(paths[5], "/percent_mapped_plot.pdf"), w = 8, h = 4)
