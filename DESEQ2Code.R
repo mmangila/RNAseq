@@ -72,7 +72,7 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
     )
     de.genes <- lfcShrink(dds,
                           coef = paste0(group, "_",
-                                       as.character(combos[2,x]), "_",
+                                       as.character(combos[2,x]), "_vs_",
                                        as.character(combos[1,x])
                           ),
                           res = de.genes,
