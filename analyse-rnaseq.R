@@ -24,7 +24,7 @@ text_size_theme_8_labels <- theme(axis.text=element_text(size=8),
 # https://stackoverflow.com/questions/17311917/ggplot2-the-unit-of-size
 label_size = 25.4/72 * 8
 
-analyse.RNAseq <- function (project.folder,analysis, group) {
+analyse.RNAseq <- function (project.folder,analysis, group, padj) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
@@ -104,11 +104,11 @@ analyse.RNAseq <- function (project.folder,analysis, group) {
 
     #edgeRCode
     print("Running edgeR")
-    find_de_edger(old.dge, group, keyfile, project_paths, analysis)
+    find_de_edger(old.dge, group, keyfile, project_paths, analysis, padj)
 
     #DESEQ2Code
     print("Running DESeq2")
-    find_de_deseq(dge.DESeq, keyfile, group, project_paths)
+    find_de_deseq(dge.DESeq, keyfile, group, padj, project_paths)
 
     # Find the union
     print("Combining the analyses")

@@ -1,4 +1,4 @@
-find_de_edger <- function (old.dge, group, keyfile, paths, analysis) {
+find_de_edger <- function (old.dge, group, keyfile, paths, analysis, padj) {
   dge <- calcNormFactors(old.dge, method="TMM")
   design <- eval(parse(text = paste0('model.matrix(~0 + ',
                                      group,
@@ -14,7 +14,7 @@ find_de_edger <- function (old.dge, group, keyfile, paths, analysis) {
   de_edger_pca(v, group, keyfile, paths)
   print("Begin DE gene table generation")
   gene.names <- as.character(rownames(dge$counts))
-  de_edger_tables(keyfile, group, fit, paths, design, gene.names, analysis, v)
+  de_edger_tables(keyfile, group, fit, paths, design, gene.names, analysis, v, padj)
 }
 
 de_edger_mds <- function (dge, group, keyfile, paths, v) {
@@ -120,7 +120,7 @@ de_edger_pca <- function (v, group, keyfile, paths) {
   dev.off()
 }
 
-de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, analysis, v) {
+de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, analysis, v, padj) {
   combos <- eval(
     parse(
       text = paste0(
@@ -187,7 +187,7 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, ana
     plotTable <- topTable(fit=fit2, number=Inf, coef = comparison, sort.by = "logFC")
     with(plotTable, plot(logFC, -(log(adj.P.Val)), pch = 16, cex = 0.3))
     title(main=paste0("Foldchange vs FDR (adjusted p-value)", comparison), cex.main=0.5)
-    plotTable <- topTable(fit=fit2, number=Inf, coef=comparison, sort.by = "logFC", p.value = 0.05, lfc = log2(2))
+    plotTable <- topTable(fit=fit2, number=Inf, coef=comparison, sort.by = "logFC", p.value = padj, lfc = log2(2))
     # write if statement to account for when there are no DE genes
     if(length(plotTable) > 0){
       with(plotTable, points(logFC, -(log(adj.P.Val)), pch = 16,
@@ -236,11 +236,11 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, ana
 
     tt <- topTable(fit=fit2, number=Inf, coef=comparison)
     write.csv(tt, paste0(test.base.dir, test.name, "_alltags.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = 0.05)
+    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj)
     write.csv(tt, paste0(test.base.dir, test.name, "_detags.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = 0.05, lfc = log2(1.5))
+    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj, lfc = log2(1.5))
     write.csv(tt, paste0(test.base.dir, test.name, "_detags_1point5FC.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = 0.05, lfc = log2(2))
+    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj, lfc = log2(2))
     write.csv(tt, paste0(test.base.dir, test.name, "_detags_2FC.csv"))
   }
 
@@ -254,10 +254,10 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, ana
   write.csv(fc.matrix, file=paste0(out.base, analysis, "_fc.csv"))
   write.csv(fdr.matrix, file=paste0(out.base, analysis, "_fdr.csv"))
 
-  tests.sig.2FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = 0.05, lfc = log2(2), number=Inf, coef=x, sort.by = "none"))
+  tests.sig.2FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = padj, lfc = log2(2), number=Inf, coef=x, sort.by = "none"))
   names(tests.sig.2FC) <- coefs
 
-  tests.sig.1.5FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = 0.05, lfc = log2(1.5), number=Inf, coef=x, sort.by = "none"))
+  tests.sig.1.5FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = padj, lfc = log2(1.5), number=Inf, coef=x, sort.by = "none"))
   names(tests.sig.1.5FC) <- coefs
 
   cpm.matrix <- cpm(v)

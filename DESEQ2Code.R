@@ -1,4 +1,4 @@
-find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
+find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths) {
 
   print("Preparing DESEQ2 data.")
   dge.DESeq$samples$lib.size <- colSums(
@@ -20,11 +20,11 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, paths) {
   print("Begin PCA")
   de_deseq_pca(dds, group, paths)
   print("Creating gene tables.")
-  de_deseq_tables(keyfile, group, dds, paths)
+  de_deseq_tables(keyfile, group, dds, padj, paths)
 
 }
 
-de_deseq_tables <- function (keyfile, group, dds, paths) {
+de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
 
   combos <- eval(
     parse(
@@ -62,14 +62,21 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
                             test.name,
                             "/")
     dir.create(test.base.dir, showWarnings=F)
-    de.genes  <- results(
-      dds,
-      contrast = c(group,
-                   as.character(combos[1,x]),
-                   as.character(combos[2,x])
-      ),
-      alpha = 0.99999
-    )
+    de.genes <- lfcShrink(dds,
+                        coef=paste0(group,
+                                    "_",
+                                    as.character(combos[1,x]),
+                                    "_",
+                                    as.character(combos[2,x])),
+                        type="apeglm")
+    #de.genes  <- results(
+    #  dds,
+    #  contrast = c(group,
+    #               as.character(combos[1,x]),
+    #               as.character(combos[2,x])
+    #  ),
+    #  alpha = 0.99999
+    #)
     de.genes$X <- rownames(de.genes)
 
     write_csv(as.data.frame(de.genes),
@@ -83,7 +90,7 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
       de.genes.sigs <- filter.de.set(
         de.genes,
         lfc.suffixes[x,1],
-        0.05
+        padj
       )
       write_csv(as.data.frame(de.genes.sigs),
                 file = paste0(test.base.dir,
@@ -94,7 +101,7 @@ de_deseq_tables <- function (keyfile, group, dds, paths) {
 }
 
 de_deseq_pca <- function (dds, group, paths) {
-  vsd <- vst(dds, blind=FALSE)
+  vsd <- rlog(dds, blind=FALSE)
   print(head(assay(vsd), 3))
   pcaData <- plotPCA(vsd, intgroup=c(group), returnData = TRUE)
   percentVar <- round(100 * attr(pcaData, "percentVar"))
