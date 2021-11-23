@@ -32,7 +32,8 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj) {
                          "DESeq2",
                          "biomaRt",
                          "Rgraphviz",
-                         "topGO")
+                         "topGO",
+                         "EnhancedVolcano")
     libs            <- c("seqinr",
                          "car",
                          "data.table",
