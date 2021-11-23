@@ -62,13 +62,6 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
                             test.name,
                             "/")
     dir.create(test.base.dir, showWarnings=F)
-    de.genes <- lfcShrink(dds,
-                        coef=paste0(group,
-                                    "_",
-                                    as.character(combos[1,x]),
-                                    "_",
-                                    as.character(combos[2,x])),
-                        type="apeglm")
     de.genes  <- results(
       dds,
       contrast = c(group,
