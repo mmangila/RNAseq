@@ -64,7 +64,7 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths) {
     dir.create(test.base.dir, showWarnings=F)
     de.genes  <- results(
       dds,
-      coefs = paste0(group,
+      coef = paste0(group,
                     "_",
                     as.character(combos[2,x]),
                     "_",
