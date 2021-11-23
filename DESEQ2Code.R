@@ -15,7 +15,7 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths) {
 
   dds <- DESeq(dds)
 
-  resultsNames(dds) # lists the coefficients
+  print(resultsNames(dds)) # lists the coefficients
 
   print("Begin PCA")
   de_deseq_pca(dds, group, paths)
