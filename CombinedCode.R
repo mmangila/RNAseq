@@ -309,14 +309,14 @@ find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path
     )
   )
   
-  if (grepl(".tsv", func_path)) {
-    funcs <- read.table(func_path, sep = "\t")
-  } else if (grepl(".csv", func_path)) {
-    funcs <- read.csv(file = func_path)
-  } else if (is.null(func_path)) {
-    funcs <- NULL
-  } else {
-    errorCondition("File format not recognised")
+  if (annotation) {
+    if (grepl(".tsv", func_path)) {
+      funcs <- read.table(func_path, sep = "\t")
+    } else if (grepl(".csv", func_path)) {
+      funcs <- read.csv(file = func_path)
+    } else {
+      errorCondition("File format not recognised")
+    }
   }
   
   sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
