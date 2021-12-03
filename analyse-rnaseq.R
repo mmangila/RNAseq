@@ -101,6 +101,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = F
       func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
     }
     
+    print("Begin analysis")
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
