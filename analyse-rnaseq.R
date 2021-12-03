@@ -99,10 +99,15 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = F
     if (annotation) {
       func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
       func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
+    } else {
+      func_path <- NULL
+      func_focus <- NULL
     }
     
     print("Begin analysis")
     assignment.summary(project_paths,keyfile)
+    
+    print("Filter data")
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
 
@@ -116,7 +121,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = F
 
     # Find the union
     print("Combining the analyses")
-    find_combined_de(keyfile, group, lfc.suffixes, func_path, func_focus, project_paths)
+    find_combined_de(keyfile, group, lfc.suffixes, annotation, func_path, func_focus, project_paths)
 
 
 

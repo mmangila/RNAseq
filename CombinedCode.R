@@ -284,7 +284,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, funcs, func
 }
 
 
-find_combined_de <- function(keyfile, group, lfc.suffixes, func_path, func_focus, paths) {
+find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path, func_focus, paths) {
   
   combined.folder <- paste0(
     paths[3],
@@ -313,12 +313,14 @@ find_combined_de <- function(keyfile, group, lfc.suffixes, func_path, func_focus
     funcs <- read.table(func_path, sep = "\t")
   } else if (grepl(".csv", func_path)) {
     funcs <- read.csv(file = func_path)
+  } else if (is.null(func_path)) {
+    funcs <- NULL
   } else {
     errorCondition("File format not recognised")
   }
   
   sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
-  find_de_combined(combos, lfc.suffixes, combined.folder, funcs, func_focus, paths)
+  find_de_combined(combos, lfc.suffixes, combined.folder, annotation, funcs, func_focus, paths)
   sink()
 }
 
