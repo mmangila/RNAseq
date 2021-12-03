@@ -24,7 +24,15 @@ text_size_theme_8_labels <- theme(axis.text=element_text(size=8),
 # https://stackoverflow.com/questions/17311917/ggplot2-the-unit-of-size
 label_size = 25.4/72 * 8
 
-analyse.RNAseq <- function (project.folder,analysis, group, padj) {
+lfc.suffixes <- data.frame(
+  Level = c(0,1.5,2),
+  Suffix = c("_detags.csv",
+             "_detags_1point5FC.csv",
+             "_detags_2FC.csv"
+  )
+)
+
+analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = FALSE) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
@@ -61,15 +69,6 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj) {
                          "devtools",
                          "data.table")
 
-
-
-    lfc.suffixes <- data.frame(
-     Level = c(0,1.5,2),
-     Suffix = c("_detags.csv",
-                "_detags_1point5FC.csv",
-                "_detags_2FC.csv"
-     )
-    )
     devtools::source_url(
       "https://github.com/mmangila/RNAseq/raw/main/CombinedCode.R"
     )
@@ -96,9 +95,12 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj) {
     keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)],
                                        as.factor)
     colnames(keyfile)[1] <- "Sample_ID"
-    func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
-    func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
-
+    
+    if (annotation) {
+      func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
+      func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
+    }
+    
     assignment.summary(project_paths,keyfile)
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
