@@ -215,7 +215,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, annotation,
                                       key = names(edger_table)),
                            data.table(deseq_table,
                                       key = names(deseq_table)))
-      colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
+      colnames(gene_table)[which(colnames(gene_table) == "X")] <- "X"
 
       if (annotation) {
         gene_funcs  <- funcs[which(funcs[,
