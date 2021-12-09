@@ -95,18 +95,18 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = F
     keyfile[sapply(keyfile, is.numeric)] <- lapply(keyfile[sapply(keyfile, is.numeric)],
                                        as.factor)
     colnames(keyfile)[1] <- "Sample_ID"
-    
+
     if (annotation) {
       func_path <- readline("Enter the location of the genome functional annotation here (Valid format: .csv): ")
       func_focus <- readline("Which column of the functional annotation is reflected in the featureCounts results? ")
     } else {
       func_path <- NULL
-      func_focus <- NULL
+      func_focus <- "X"
     }
-    
+
     print("Begin analysis")
     assignment.summary(project_paths,keyfile)
-    
+
     print("Filter data")
     old.dge <- filter.wrapper(keyfile,group,project_paths)
     dge.DESeq <- old.dge
