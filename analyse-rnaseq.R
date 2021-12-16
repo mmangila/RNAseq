@@ -109,7 +109,7 @@ analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = F
 
     print("Filter data")
     old.dge <- filter.wrapper(keyfile,group,project_paths)
-    dge.DESeq <- old.dge
+    dge.DESeq <- read.data(keyfile,group,project_paths)
 
     #edgeRCode
     print("Running edgeR")
