@@ -215,7 +215,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, annotation,
                                       key = names(edger_table)),
                            data.table(deseq_table,
                                       key = names(deseq_table)))
-      colnames(gene_table)[which(colnames(gene_table) == "X")] <- "X"
+      colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
       if (annotation) {
         gene_funcs  <- funcs[which(funcs[,
@@ -311,7 +311,7 @@ find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path
 
   if (annotation) {
     if (grepl(".tsv", func_path)) {
-      funcs <- read.table(func_path, sep = "\t")
+      funcs <- read.table(func_path, sep = "\t", header = TRUE)
     } else if (grepl(".csv", func_path)) {
       funcs <- read.csv(file = func_path)
     } else {
