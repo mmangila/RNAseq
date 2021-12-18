@@ -220,7 +220,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, annotation,
       if (annotation) {
         gene_funcs  <- funcs[which(funcs[,
                                          which(
-                                           colnames(gene_table) == func_focus
+                                           colnames(funcs) == func_focus
                                          )]
                                    %in% comb_genes),
                              ]
@@ -262,7 +262,7 @@ find_de_combined <- function (combos, lfc.suffixes, combined.folder, annotation,
     if (annotation) {
       gene_funcs  <- funcs[which(funcs[,
                                        which(
-                                         colnames(gene_table) == func_focus
+                                         colnames(funcs) == func_focus
                                        )]
                                  %in% union(deseq.deset$X,edger.deset$X)),
                            ]
