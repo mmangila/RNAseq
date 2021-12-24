@@ -68,7 +68,7 @@ analyse_topGo <- function(ontology_to_test,
     mutate(fdr = p.adjust(Fisher_p_value, method = "BH"),
            Aspect = ontology_to_test)
   
-  sigRes_fdr   <- allRes_fdr %>% filter(fdr < 0.01)
+  sigRes_fdr   <- allRes_fdr %>% filter(fdr < 0.05)
   
   write_csv(sigRes_fdr,
             paste0(outDir,
@@ -84,10 +84,27 @@ analyse_topGo <- function(ontology_to_test,
   resultKS <- runTest(GOdata, algorithm = "classic", statistic = "ks")
   resultKS.elim <- runTest(GOdata, algorithm = "elim", statistic = "ks")
   
-  pdf(paste0(outDir,"/", test_name,"_",de_direction,"_",ontology_to_test, "_nodegraphs.pdf"))
+  node_path <- paste0(outDir,
+                      "/",
+                      test_name,
+                      "_",
+                      de_direction,
+                      "_",
+                      ontology_to_test,
+                      "_nodegraphs.pdf")
+  
+  pdf(node_path)
   par(cex=0.5)
-  showSigOfNodes(GOdata, score(resultKS.elim), firstSigNodes = 5, useInfo = 'all')
-  printGraph(GOdata, resultFisher, firstSigNodes = 5, fn.prefix = "tGO", useInfo = "all", pdfSW = TRUE)
+  showSigOfNodes(GOdata,
+                 score(resultKS.elim),
+                 firstSigNodes = 5,
+                 useInfo = 'all')
+  printGraph(GOdata,
+             resultFisher,
+             firstSigNodes = 5,
+             fn.prefix = "tGO",
+             useInfo = "all",
+             pdfSW = TRUE)
   dev.off()
   
 }
@@ -103,7 +120,11 @@ GO_plot_comparison <- function (ontology_to_test,
   #Arguments
   # plot_comparison = "Gall_base.vs.Surrounding_tissue_down_BP"
   
-  plot_comparison <- paste0(test_name, "_", de_direction, "_", ontology_to_test)
+  plot_comparison <- paste0(test_name,
+                            "_",
+                            de_direction,
+                            "_",
+                            ontology_to_test)
   
   big_data_selection <- big_data %>%
     filter(sample %in% plot_comparison) %>%
