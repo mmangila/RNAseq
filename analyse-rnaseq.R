@@ -32,7 +32,11 @@ lfc.suffixes <- data.frame(
   )
 )
 
-analyse.RNAseq <- function (project.folder,analysis, group, padj, annotation = FALSE) {
+analyse.RNAseq <- function (project.folder,
+                            analysis,
+                            group,
+                            padj,
+                            annotation = FALSE, go = FALSE) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
