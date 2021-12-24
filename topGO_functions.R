@@ -178,7 +178,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                                           project.folder,
                                           "_readMappings.tsv"))
   
-  sapply(1:combos[1,], function (x) {
+  sapply(1:length(combos[1,]), function (x) {
     map2(
       rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
       analyse_topGo,
