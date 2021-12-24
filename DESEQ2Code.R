@@ -1,4 +1,4 @@
-find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths, lfcShrink) {
+find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths, fcShrink) {
 
   print("Preparing DESEQ2 data.")
   dge.DESeq$samples$lib.size <- colSums(
@@ -20,11 +20,11 @@ find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths, lfcShrink) {
   print("Begin PCA")
   de_deseq_pca(dds, group, paths)
   print("Creating gene tables.")
-  de_deseq_tables(keyfile, group, dds, padj, paths, lfcShrink)
+  de_deseq_tables(keyfile, group, dds, padj, paths, fcShrink)
 
 }
 
-de_deseq_tables <- function (keyfile, group, dds, padj, paths, lfcShrink) {
+de_deseq_tables <- function (keyfile, group, dds, padj, paths, fcShrink) {
 
   combos <- eval(
     parse(
@@ -70,7 +70,7 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths, lfcShrink) {
       alpha = 0.99999
     )
 
-    if (lfcShrink == TRUE) {
+    if (fcShrink == TRUE) {
       de.genes <- lfcShrink(dds,
                             contrast = c(group,
                                          as.character(combos[1,x]),
