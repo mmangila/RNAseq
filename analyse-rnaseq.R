@@ -36,7 +36,7 @@ analyse.RNAseq <- function (project.folder,
                             analysis,
                             group,
                             padj,
-                            annotation = FALSE, go = FALSE) {
+                            annotation = FALSE, go = FALSE, lfcShrink = FALSE) {
 
     biocManagerLibs <- c("edgeR",
                          "limma",
@@ -121,7 +121,7 @@ analyse.RNAseq <- function (project.folder,
 
     #DESEQ2Code
     print("Running DESeq2")
-    find_de_deseq(dge.DESeq, keyfile, group, padj, project_paths)
+    find_de_deseq(dge.DESeq, keyfile, group, padj, project_paths, lfcShrink)
 
     # Find the union
     print("Combining the analyses")
@@ -133,13 +133,9 @@ analyse.RNAseq <- function (project.folder,
                      func_focus,
                      project_paths,
                      go)
-    
+
     print("Analysis finished")
 
 
 
 }
-
-convert_to_factor <- function (variable) {
-    variable <- as.factor(variable)
-    }
