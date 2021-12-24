@@ -187,7 +187,14 @@ find_de_combined <- function (combos,
 }
 
 
-find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path, func_focus, paths) {
+find_combined_de <- function(keyfile,
+                             group,
+                             lfc.suffixes,
+                             annotation,
+                             func_path,
+                             func_focus,
+                             paths,
+                             go) {
 
   combined.folder <- paste0(
     paths[3],
@@ -223,8 +230,16 @@ find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path
   }
 
   sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
-  find_de_combined(combos, lfc.suffixes, combined.folder, annotation, funcs, func_focus, paths)
+  find_de_combined(combos,
+                   lfc.suffixes,
+                   combined.folder,
+                   annotation,
+                   funcs,
+                   func_focus,
+                   paths)
   sink()
+  
+  print("Begin GO analysis")
   
   if (go == TRUE) {
     devtools::source_url(

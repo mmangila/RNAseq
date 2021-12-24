@@ -125,7 +125,16 @@ analyse.RNAseq <- function (project.folder,
 
     # Find the union
     print("Combining the analyses")
-    find_combined_de(keyfile, group, lfc.suffixes, annotation, func_path, func_focus, project_paths)
+    find_combined_de(keyfile,
+                     group,
+                     lfc.suffixes,
+                     annotation,
+                     func_path,
+                     func_focus,
+                     project_paths,
+                     go)
+    
+    print("Analysis finished")
 
 
 
