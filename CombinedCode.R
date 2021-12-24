@@ -227,7 +227,11 @@ find_combined_de <- function(keyfile, group, lfc.suffixes, annotation, func_path
   sink()
   
   if (go == TRUE) {
+    devtools::source_url(
+      "https://github.com/mmangila/RNAseq/blob/e63548f13a543e711494f2c878300f9aa86f4a40/topGO_functions.R"
+      )
     
+    analyse_go(funcs, func_focus, project.folder, combos, project_paths)
   }
 }
 

@@ -94,7 +94,11 @@ analyse_topGo <- function(ontology_to_test,
 
 
 
-GO_plot_comparison <- function (ontology_to_test, de_direction, test_name, big_data, dataFolder) {
+GO_plot_comparison <- function (ontology_to_test,
+                                de_direction,
+                                test_name,
+                                big_data,
+                                dataFolder) {
   
   #Arguments
   # plot_comparison = "Gall_base.vs.Surrounding_tissue_down_BP"
