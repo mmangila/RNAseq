@@ -238,14 +238,14 @@ find_combined_de <- function(keyfile,
                    func_focus,
                    paths)
   sink()
-  
+
   print("Begin GO analysis")
-  
+
   if (go == TRUE) {
     devtools::source_url(
-      "https://github.com/mmangila/RNAseq/blob/e63548f13a543e711494f2c878300f9aa86f4a40/topGO_functions.R"
+      "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
       )
-    
+
     analyse_go(funcs, func_focus, project.folder, combos, project_paths)
   }
 }
