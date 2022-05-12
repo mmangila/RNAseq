@@ -8,8 +8,8 @@ find_de_edger <- function (old.dge, group, keyfile, paths, analysis, padj) {
   fit <- lmFit(v,design)
   fit <- eBayes(fit)
 
-  print("Begin MDS")
-  de_edger_mds(dge, group, keyfile, paths, v)
+  # print("Begin MDS")
+  # de_edger_mds(dge, group, keyfile, paths, v)
   print("Begin PCA")
   de_edger_pca(v, group, keyfile, paths)
   print("Begin DE gene table generation")
