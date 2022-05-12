@@ -158,7 +158,22 @@ filter.wrapper <- function (keyfile,group,paths) {
 
   dge <- filtering_step(raw.counts, old.dge)
   gene.names <- as.character(rownames(dge$counts))
+  
+  if (annotation) {
+    if (grepl(".tsv", func_path)) {
+      funcs <- read.table(func_path, sep = "\t", header = TRUE)
+    } else if (grepl(".csv", func_path)) {
+      funcs <- read.csv(file = func_path)
+    } else {
+      errorCondition("File format not recognised")
+    }
 
+    gene.match <- match(row.names(dge$counts),
+                        funcs[, which(colnames(funcs) == func_focus)])
+    geneDescriptionMatched <- funcs[gene.match, ]
+
+    dge$genes <- geneDescriptionMatched
+  }
   return(dge)
 }
 
