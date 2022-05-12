@@ -95,17 +95,17 @@ de_edger_pca <- function (v, group, keyfile, paths) {
   CPM_tbl <- as_tibble(voom_matrix, rownames = "Gene")
 
   # replace NaN with NA? Nope there arent any...
-  which(is.na(CPM_tbl))
+  # which(is.na(CPM_tbl))
   # CPM_tbl[is.na(CPM_tbl)] <- NA
 
   MDS_table <- plotMDS(CPM_tbl[,-1], plot = F, ndim = 5, top = 500)
   # MDS_table <- plotMDS(v, plot = F, ndim = 5)
 
-  cmdscale_out <- as_tibble(MDS_table$cmdscale.out)
+  # cmdscale_out <- as_tibble(MDS_table$cmdscale.out)
 
-  cmdscale_out <- cmdscale_out %>%
-    mutate(Sample_ID = colnames(v)) %>%
-    left_join(keyfile, by = "Sample_ID")
+  # cmdscale_out <- cmdscale_out %>%
+  #  mutate(Sample_ID = colnames(v)) %>%
+  #  left_join(keyfile, by = "Sample_ID")
 
   pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment.pdf"), width = 5, height = 3.5)
   make_PCA_plots(Timepoint = "ALL", dot_colour = group, keyfile, CPM_tbl)
