@@ -65,16 +65,16 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths, fcShrink) {
     de.genes  <- results(
       dds,
       contrast = c(group,
-                   as.character(combos[1,x]),
-                   as.character(combos[2,x])),
+                   as.character(combos[2,x]),
+                   as.character(combos[1,x])),
       alpha = 0.99999
     )
 
     if (fcShrink == TRUE) {
       de.genes <- lfcShrink(dds,
                             contrast = c(group,
-                                         as.character(combos[1,x]),
-                                         as.character(combos[2,x])),
+                                         as.character(combos[2,x]),
+                                         as.character(combos[1,x])),
                             res = de.genes,
                             type="ashr")
     }

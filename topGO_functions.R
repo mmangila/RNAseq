@@ -1,20 +1,20 @@
 analyse_topGo <- function(ontology_to_test,
-                           de_direction,
-                           test_name,
-                           de_table_file,
-                           outDir,
-                           gene_focus,
-                           geneID2GO) {
+                          de_direction,
+                          test_name,
+                          de_table_file,
+                          outDir,
+                          func_focus,
+                          geneID2GO) {
 
   ### args
   # ontology_to_test = "BP"
   # test_name = "Gall_base.vs.Ungalled_leaf"
   # test_number = 3
-  # de_table_file = paste0(results_folder,"/DE_tables/Surrounding_tissue.vs.Ungalled_leaf/Surrounding_tissue.vs.Ungalled_leaf_alltags.csv")
+  # de_table_file = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/DE_tables/Surrounding_tissue.vs.Ungalled_leaf/Surrounding_tissue.vs.Ungalled_leaf_alltags.csv")
   # # need a column called "model", "adj.P.Val" and "logFC"
   # de_direction = "down"
-  # outDir = paste0(project_paths[3],"/Combined/GO_tests/")
-  #####
+  # outDir = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/GO_tests/")
+  # #####
 
   dir.create(outDir, showWarnings = F)
   de_table <- read_csv(de_table_file)
@@ -178,20 +178,36 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                                           project.folder,
                                           "_readMappings.tsv"))
 
-  sapply(1:length(combos[1,]), function (x) {
-    map2(
-      rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-      analyse_topGo,
-      test_name     = paste0(combos[1,x], ".vs.", combos[2,x]),
-      de_table_file = paste0(project_paths[3],
-                             "/Combined/DE_tables/",
-                             paste0(combos[1,x], ".vs.", combos[2,x]),
-                             "/",
-                             paste0(combos[1,x], ".vs.", combos[2,x]),
-                             "_1point5FC.csv"),
-      # need a column called "locusName", "adj.P.Val" and "logFC",
-      outDir = paste0(project_paths[3],"/Combined/GO_tests/")
-    )
+  go_opts <- expand.grid(c("BP", "MF", "CC"),c("up", "down"))
+
+  sapply(1:length(combos[1, ]), function (x) {
+    sapply(1:length(go_opts[, 1]), function (y) {
+      analyse_topGo(as.character(go_opts[y, 1]),
+                    as.character(go_opts[y, 2]),
+                    paste0(combos[1,x], ".vs.", combos[2,x]),
+                    paste0(project_paths[3],
+                           "/Combined/DE_tables/",
+                           paste0(combos[1,x], ".vs.", combos[2,x]),
+                           "/",
+                           paste0(combos[1,x], ".vs.", combos[2,x]),
+                           "_detags_1point5FC.csv"),
+                    paste0(project_paths[3],"/Combined/GO_tests/"),
+                    func_focus,
+                    geneID2GO)
+    })
+    # map2(
+    #   rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
+    #   analyse_topGo,
+    #   test_name     = paste0(combos[1,x], ".vs.", combos[2,x]),
+    #   de_table_file = paste0(project_paths[3],
+    #                          "/Combined/DE_tables/",
+    #                          paste0(combos[1,x], ".vs.", combos[2,x]),
+    #                          "/",
+    #                          paste0(combos[1,x], ".vs.", combos[2,x]),
+    #                          "_1point5FC.csv"),
+    #   # need a column called "locusName", "adj.P.Val" and "logFC",
+    #   outDir = paste0(project_paths[3],"/Combined/GO_tests/")
+    # )
   })
 
   dataFolder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
