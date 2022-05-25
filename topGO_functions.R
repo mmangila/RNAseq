@@ -182,7 +182,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
 
   sapply(1:length(combos[1, ]), function (x) {
     sapply(1:length(go_opts[, 1]), function (y) {
-      analyse_topGo(as.character(go_opts[y, 1]),
+      tryCatch(analyse_topGo(as.character(go_opts[y, 1]),
                     as.character(go_opts[y, 2]),
                     paste0(combos[1,x], ".vs.", combos[2,x]),
                     paste0(project_paths[3],
@@ -193,7 +193,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                            "_detags_1point5FC.csv"),
                     paste0(project_paths[3],"/Combined/GO_tests/"),
                     func_focus,
-                    geneID2GO)
+                    geneID2GO), error = function (e) return(NULL))
     })
   })
 
