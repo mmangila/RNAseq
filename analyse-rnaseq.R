@@ -36,6 +36,7 @@ analyse.RNAseq <- function (project.folder,
                             analysis,
                             group,
                             padj,
+                            mapman_focus,
                             annotation = FALSE, go = FALSE, fcShrink = FALSE) {
 
     biocManagerLibs <- c("edgeR",
@@ -133,7 +134,8 @@ analyse.RNAseq <- function (project.folder,
                      func_focus,
                      project_paths,
                      go,
-                     project.folder)
+                     project.folder,
+                     mapman_focus)
 
     print("Analysis finished")
 
