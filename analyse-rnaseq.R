@@ -134,9 +134,29 @@ analyse.RNAseq <- function (project.folder,
                      func_focus,
                      project_paths,
                      go,
-                     project.folder,
-                     mapman_focus)
-
+                     project.folder)
+    
+    print("Generate MapMan files")
+    dir.create(paste0(project_paths[3], "/Combined/MapMan"))
+    sapply(1:length(combos[1, ]), function (x) {
+      test.name <- paste0(as.character(combos[1, x]),
+                          ".vs.",
+                          as.character(combos[2, x]))
+      comb_res <- read.csv(paste0(results_folder,
+                                  "/Combined/DE_tables/",
+                                  test.name, "/",
+                                  test.name,
+                                  "_detags_1point5FC.csv"))
+      write.table(comb_res[, which(colnames(comb_res) %in% c( "transcriptName", "edger_logFC"))],
+                  file = paste0(results_folder,
+                                "/Combined/MapMan/",
+                                test.name,
+                                "_detags_1point5FC_mapman.txt"),
+                  sep = "\t",
+                  quote = FALSE,
+                  row.names = FALSE)
+})
+    
     print("Analysis finished")
 
 
