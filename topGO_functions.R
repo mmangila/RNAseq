@@ -188,7 +188,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                              paste0(combos[1,x], ".vs.", combos[2,x]),
                              "/",
                              paste0(combos[1,x], ".vs.", combos[2,x]),
-                             "_1point5FC.csv"),
+                             "_detags_1point5FC.csv"),
       # need a column called "locusName", "adj.P.Val" and "logFC",
       outDir = paste0(project_paths[3],"/Combined/GO_tests/")
     )
