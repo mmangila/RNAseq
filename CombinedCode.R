@@ -194,7 +194,8 @@ find_combined_de <- function(keyfile,
                              func_path,
                              func_focus,
                              paths,
-                             go) {
+                             go,
+                             project.folder) {
 
   combined.folder <- paste0(
     paths[3],
