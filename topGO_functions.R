@@ -195,6 +195,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                     func_focus,
                     geneID2GO)
     })
+  })
 
   dataFolder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
 
