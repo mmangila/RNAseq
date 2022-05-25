@@ -132,7 +132,8 @@ analyse.RNAseq <- function (project.folder,
                      func_path,
                      func_focus,
                      project_paths,
-                     go)
+                     go,
+                     project.folder)
 
     print("Analysis finished")
 
