@@ -147,7 +147,7 @@ analyse.RNAseq <- function (project.folder,
                                   test.name, "/",
                                   test.name,
                                   "_detags_1point5FC.csv"))
-      write.table(comb_res[, which(colnames(comb_res) %in% c( "transcriptName", "edger_logFC"))],
+      write.table(comb_res[, which(colnames(comb_res) %in% c(mapman_focus, "edger_logFC"))],
                   file = paste0(results_folder,
                                 "/Combined/MapMan/",
                                 test.name,
