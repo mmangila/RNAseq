@@ -252,6 +252,6 @@ find_combined_de <- function(keyfile,
 
 add_gene_funcs <- function (combos, funcs) {
   sapply(1:length(combos[1, ]), function (x) {
-
+    
   })
 }

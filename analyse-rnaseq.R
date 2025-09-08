@@ -92,7 +92,7 @@ analyse.RNAseq <- function (project.folder,
     install_libraries(biocManagerLibs,BiocManager::install)
     install_libraries(libs,install.packages)
 
-    project_paths <- file_paths(project.folder,analysis)
+    project_paths <- file_paths(project.folder, analysis)
     keyfile <- create.folders(project_paths)
     keyfile[sapply(keyfile, is.character)] <- lapply(keyfile[sapply(keyfile, is.character)],
                                        as.factor)
