@@ -40,7 +40,7 @@ find_de_edger <- function(old_dge,
     dge <- ddssva
   }
 
-  v   <- limma::voomLmFit(dge,
+  v   <- edger::voomLmFit(dge,
                           design,
                           plot = TRUE, sample.weights = surrogate_variable)
   fit <- limma::eBayes(v)
