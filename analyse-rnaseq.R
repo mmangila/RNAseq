@@ -93,8 +93,8 @@ analyse_rnaseq <-  function(project_folder,
 
   sapply(urls, devtools::source_url)
 
-  install_libraries(bioc_manager_libs, BiocManager::install)
-  install_libraries(libs,              install.packages)
+  install_libraries(bioconductor_libs, BiocManager::install)
+  install_libraries(base_libs,         install.packages)
 
   project_paths <- file_paths(project_folder, analysis)
   keyfile       <- create.folders(project_paths)
