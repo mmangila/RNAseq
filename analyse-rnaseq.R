@@ -124,7 +124,7 @@ analyse_rnaseq <-  function(project_folder,
   assignment.summary(project_paths, keyfile)
 
   print("Filter data")
-  old_dge   <- filter.wrapper(keyfile, group, project_paths, annotation, func_path)
+  old_dge   <- filter.wrapper(keyfile, group, project_paths, annotation, func_path, func_focus)
   dge_deseq <- read.data(keyfile, group, project_paths)
 
   #edgeRCode

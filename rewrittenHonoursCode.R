@@ -140,7 +140,7 @@ read.data <- function(keyfile,group,paths) {
   return(dge)
 }
 
-filter.wrapper <- function (keyfile, group, paths, annotation, func_path) {
+filter.wrapper <- function (keyfile, group, paths, annotation, func_path, func_focus) {
   dge        <- read.data(keyfile, group, paths)
   gene.names <- as.character(rownames(dge$counts))
 
