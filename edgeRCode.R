@@ -5,7 +5,25 @@ find_de_edger <- function(old_dge,
                           analysis,
                           surrogate_variable,
                           padj) {
+
   dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
+
+  if (surrogate_variable) {
+    dat    <- cpm(dge)
+    mod    <- eval(parse(text = paste0(
+      "model.matrix(~ ",
+      group,
+      ", data = keyfile)"
+    )))
+    mod0   <- model.matrix(~ 1, data = keyfile)
+    svseq  <- sva::svaseq(dat, mod, mod0, n.sv = 2)
+    ddssva <- dge
+    ddssva$SV1 <- svseq$sv[, 1]
+    ddssva$SV2 <- svseq$sv[, 2]
+    eval(parse(text = paste("design(ddssva) <- ~ SV1 + SV2 +", group)))
+    dge <- ddssva
+  }
+
   design <- eval(parse(text =  paste0("model.matrix(~ 0 + ",
                                       group,
                                       ", data = keyfile)")))

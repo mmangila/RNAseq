@@ -47,15 +47,16 @@ analyse_rnaseq <-  function(project_folder,
                             annotation = FALSE, go = FALSE, fc_shrink = FALSE,
                             surrogate_variable = FALSE) {
 
-  bioc_manager_libs <-  c("edgeR",
+  bioconductor_libs <-  c("edgeR",
                           "limma",
                           "pcaMethods",
                           "DESeq2",
                           "biomaRt",
                           "Rgraphviz",
                           "topGO",
-                          "EnhancedVolcano")
-  libs              <-  c("seqinr",
+                          "EnhancedVolcano",
+                          "sva")
+  base_libs         <-  c("seqinr",
                           "car",
                           "data.table",
                           "devtools",
