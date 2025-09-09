@@ -144,7 +144,7 @@ de_edger_pca <- function(v, group, keyfile, paths) {
   # replace NaN with NA? Nope there arent any...
   which(is.na(cpm_tbl))
 
-  mds_table <- limma::plotMDS(cpm_tbl)
+  #mds_table <- limma::plotMDS(cpm_tbl)
 
   pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment.pdf"),
       width = 5, height = 3.5)
