@@ -191,6 +191,8 @@ de_edger_tables <- function(keyfile,
       )
     )
   })
+
+  if (length(inside2) > 1) { 
   contrast_matrix <- eval(
     parse(
       text = paste0("makeContrasts(",
@@ -198,6 +200,17 @@ de_edger_tables <- function(keyfile,
                     ", levels = design)")
     )
   )
+  } else if (length(inside2) == 1) {
+  contrast_matrix <- eval(
+    parse(
+      text = paste0(
+        "makeContrasts(",
+        inside2,
+        ", levels = design)"
+      )
+    )
+  )
+  }
 
   fit2 <- limma::contrasts.fit(fit, contrast_matrix)
   fit2 <- limma::eBayes(fit2)
