@@ -14,7 +14,7 @@ find_de_edger <- function(old_dge,
     group,
     ", data = keyfile)"
   )))
-  group_levels <- eval(parse(
+  colnames(design) <- eval(parse(
     text = paste0(
       "levels(as.factor(keyfile$",
       group,
