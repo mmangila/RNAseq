@@ -38,7 +38,7 @@ find_de_edger <- function(old_dge,
     ddssva$SV2 <- svseq$sv[, 2]
     design <- eval(parse(text = paste("model.matrix(~ 0 + ", group,
                                       " + SV1 + SV2",
-                                      ", data = keyfile")))
+                                      ", data = keyfile)")))
     colnames(design)[seq_along(group_levels)] <- group_levels
     dge <- ddssva
   }
