@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1635737833529.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CDD8C8E2",
+    "lastKnownWriteTime" : 140428250710019,
+    "last_content_update" : 1635737833529,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "context" : "namespace:base:::get0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_code_browser"
+}

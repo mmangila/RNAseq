@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1638598001671.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F0169BF3",
+    "lastKnownWriteTime" : 1637631829,
+    "last_content_update" : 1638757743113,
+    "path" : "~/github/RNAseq/edgeRCode.R",
+    "project_path" : "edgeRCode.R",
+    "properties" : {
+        "cursorPosition" : "319,25",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

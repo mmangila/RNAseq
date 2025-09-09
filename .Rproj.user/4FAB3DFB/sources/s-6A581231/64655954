@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1637892475863.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3480691862",
+    "id" : "64655954",
+    "lastKnownWriteTime" : 1637645803,
+    "last_content_update" : 1637645803,
+    "path" : "~/github/RNAseq/rewrittenHonoursCode.R",
+    "project_path" : "rewrittenHonoursCode.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

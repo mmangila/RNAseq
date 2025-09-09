@@ -194,8 +194,7 @@ find_combined_de <- function(keyfile,
                              func_path,
                              func_focus,
                              paths,
-                             go,
-                             project.folder) {
+                             go) {
 
   combined.folder <- paste0(
     paths[3],
@@ -247,7 +246,7 @@ find_combined_de <- function(keyfile,
       "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
       )
 
-    analyse_go(funcs, func_focus, project.folder, combos, paths)
+    analyse_go(funcs, func_focus, project.folder, combos, project_paths)
   }
 }
 

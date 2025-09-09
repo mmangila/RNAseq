@@ -1,0 +1,9 @@
+{
+    "path" : "~/github/RNAseq",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

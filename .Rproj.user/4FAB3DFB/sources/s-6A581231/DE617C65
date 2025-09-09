@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1640359280857.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "508559677",
+    "id" : "DE617C65",
+    "lastKnownWriteTime" : 1640351060,
+    "last_content_update" : 1640359336939,
+    "path" : "~/github/RNAseq/DESEQ2Code.R",
+    "project_path" : "DESEQ2Code.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

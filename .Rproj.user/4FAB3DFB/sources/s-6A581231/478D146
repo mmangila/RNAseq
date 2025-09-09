@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1637891077739.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "478D146",
+    "lastKnownWriteTime" : 1640335494,
+    "last_content_update" : 1640335494,
+    "path" : "~/github/RNAseq/CombinedCode.R",
+    "project_path" : "CombinedCode.R",
+    "properties" : {
+        "cursorPosition" : "242,0",
+        "scrollLine" : "237"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
