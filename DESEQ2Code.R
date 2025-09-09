@@ -20,7 +20,7 @@ find_de_deseq <- function(dge_deseq,
   )))
 
   if (surrogate_variable) {
-    dat <- counts(dds)
+    dat <- counts(dds, normalized = TRUE)
     mod <- eval(parse(text = paste0(
       "model.matrix(~ ",
       group,
