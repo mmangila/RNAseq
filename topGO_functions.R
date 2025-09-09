@@ -1,10 +1,10 @@
-analyse_topGo <- function(ontology_to_test,
+analyse_topgo <- function(ontology_to_test,
                           de_direction,
                           test_name,
                           de_table_file,
-                          outDir,
+                          out_dir,
                           func_focus,
-                          geneID2GO) {
+                          geneid_to_go) {
 
   ### args
   # ontology_to_test = "BP"
@@ -13,17 +13,21 @@ analyse_topGo <- function(ontology_to_test,
   # de_table_file = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/DE_tables/Surrounding_tissue.vs.Ungalled_leaf/Surrounding_tissue.vs.Ungalled_leaf_alltags.csv")
   # # need a column called "model", "adj.P.Val" and "logFC"
   # de_direction = "down"
-  # outDir = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/GO_tests/")
+  # out_dir = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/GO_tests/")
   # #####
 
-  dir.create(outDir, showWarnings = F)
+  dir.create(out_dir, showWarnings = FALSE)
   de_table <- read_csv(de_table_file)
   gene_universe <- de_table %>% pull(func_focus)
 
   if (de_direction == "up") {
-    de_locus <- as.data.frame(de_table[which(de_table$edger_logFC > 1),1])[,1]
+    de_locus <- as.data.frame(
+      de_table[which(de_table$edger_logFC > 1), 1]
+    )[, 1]
   } else if (de_direction == "down") {
-    de_locus <- as.data.frame(de_table[which(de_table$edger_logFC < 1),1])[,1]
+    de_locus <- as.data.frame(
+      de_table[which(de_table$edger_logFC < 1), 1]
+    )[, 1]
   } else {
     print("de direction confusion")
   }
@@ -34,44 +38,44 @@ analyse_topGo <- function(ontology_to_test,
 
   ### build go data
 
-  GOdata <- new(
+  go_data <- new(
     "topGOdata",
     description = test_name,
-    ontology = ontology_to_test,
-    allGenes = gene_list,
-    annot = annFUN.gene2GO,
-    nodeSize = 10,
-    gene2GO = geneID2GO
+    ontology    = ontology_to_test,
+    allGenes    = gene_list,
+    annot       = annFUN.gene2GO,
+    nodeSize    = 10,
+    gene2GO     = geneid_to_go
   )
 
-  resultFisher <- runTest(GOdata,
-                          algorithm = "classic",
-                          statistic = "fisher")
+  result_fisher <- runTest(go_data,
+                           algorithm = "classic",
+                           statistic = "fisher")
 
-  topRes       <- GenTable(GOdata,
-                           classicFisher = resultFisher,
-                           topNodes = "10",
-                           numChar = 1000,
-                           orderBy = "classicFisher")
+  top_res       <- GenTable(go_data,
+                            classicFisher = result_fisher,
+                            topNodes = "10",
+                            numChar = 1000,
+                            orderBy = "classicFisher")
 
   # to plot the result
 
-  allGO        <- usedGO(object = GOdata)
+  all_go        <- usedGO(object = go_data)
 
-  allRes       <- as.tibble(GenTable(GOdata,
-                                     Fisher_p_value = resultFisher,
-                                     topNodes = length(allGO),
-                                     numChar = 1000,
-                                     orderBy = "classicFisher"))
+  all_res       <- as.tibble(GenTable(go_data,
+                                      Fisher_p_value = result_fisher,
+                                      topNodes = length(all_go),
+                                      numChar = 1000,
+                                      orderBy = "classicFisher"))
 
-  allRes_fdr   <- allRes %>%
+  all_res_fdr   <- all_res %>%
     mutate(fdr = p.adjust(Fisher_p_value, method = "BH"),
            Aspect = ontology_to_test)
 
-  sigRes_fdr   <- allRes_fdr %>% filter(fdr < 0.05)
+  sig_res_fdr   <- all_res_fdr %>% filter(fdr < 0.05)
 
-  write_csv(sigRes_fdr,
-            paste0(outDir,
+  write_csv(sig_res_fdr,
+            paste0(out_dir,
                    "/",
                    test_name,
                    "_",
@@ -81,10 +85,10 @@ analyse_topGo <- function(ontology_to_test,
                    ".csv"))
 
   #### Make graphs
-  resultKS <- runTest(GOdata, algorithm = "classic", statistic = "ks")
-  resultKS.elim <- runTest(GOdata, algorithm = "elim", statistic = "ks")
+  result_ks      <- runTest(go_data, algorithm = "classic", statistic = "ks")
+  result_ks_elim <- runTest(go_data, algorithm = "elim",    statistic = "ks")
 
-  node_path <- paste0(outDir,
+  node_path <- paste0(out_dir,
                       "/",
                       test_name,
                       "_",
@@ -94,28 +98,28 @@ analyse_topGo <- function(ontology_to_test,
                       "_nodegraphs.pdf")
 
   pdf(node_path)
-  par(cex=0.5)
-  showSigOfNodes(GOdata,
-                 score(resultKS.elim),
+  par(cex = 0.5)
+  showSigOfNodes(go_data,
+                 score(result_ks_elim),
                  firstSigNodes = 5,
-                 useInfo = 'all')
-  printGraph(GOdata,
-             resultFisher,
+                 useInfo       = "all")
+  printGraph(go_data,
+             result_fisher,
              firstSigNodes = 5,
-             fn.prefix = "tGO",
-             useInfo = "all",
-             pdfSW = TRUE)
+             fn.prefix     = "tGO",
+             useInfo       = "all",
+             pdfSW         = TRUE)
   dev.off()
 
 }
 
 
 
-GO_plot_comparison <- function (ontology_to_test,
-                                de_direction,
-                                test_name,
-                                big_data,
-                                dataFolder) {
+go_plot_comparison <- function(ontology_to_test,
+                               de_direction,
+                               test_name,
+                               big_data,
+                               data_folder) {
 
   #Arguments
   # plot_comparison = "Gall_base.vs.Surrounding_tissue_down_BP"
@@ -157,12 +161,12 @@ GO_plot_comparison <- function (ontology_to_test,
       x = "Relative enrichment (Observed/Expected)"
     )
 
-  pdf(paste0(dataFolder, "/", plot_comparison, "_GO_plot.pdf"))
+  pdf(paste0(data_folder, "/", plot_comparison, "_GO_plot.pdf"))
   print(g)
   dev.off()
 }
 
-analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths) {
+analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths) {
 
   geneDescription_GO <- funcs %>%
     dplyr::select(func_focus, GO) %>%
@@ -170,23 +174,19 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
   geneDescription_GO <- geneDescription_GO %>% filter(!is.na(GOid_list))
 
   write_tsv(geneDescription_GO,
-            paste0(project.folder, "/", project.folder, "_readMappings.tsv"),
+            paste0(project_folder, "/", project_folder, "_readMappings.tsv"),
             col_names = F)
 
-  geneID2GO <- readMappings(file = paste0(project.folder,
+  geneid_to_go <- readMappings(file = paste0(project_folder,
                                           "/",
-                                          project.folder,
+                                          project_folder,
                                           "_readMappings.tsv"))
 
-  go_opts <- expand.grid(c("BP", "MF", "CC"),c("up", "down"))
+  go_opts <- expand.grid(c("BP", "MF", "CC"), c("up", "down"))
 
   sapply(1:length(combos[1, ]), function (x) {
     sapply(1:length(go_opts[, 1]), function (y) {
-<<<<<<< HEAD
       analyse_topGo(as.character(go_opts[y, 1]),
-=======
-      tryCatch(analyse_topGo(as.character(go_opts[y, 1]),
->>>>>>> ad9fc770770925387bf8ff0f03b858ee4198c645
                     as.character(go_opts[y, 2]),
                     paste0(combos[1,x], ".vs.", combos[2,x]),
                     paste0(project_paths[3],
@@ -195,10 +195,9 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                            "/",
                            paste0(combos[1,x], ".vs.", combos[2,x]),
                            "_detags_1point5FC.csv"),
-                    paste0(project_paths[3],"/Combined/GO_tests/"),
+                    paste0(project_paths[3], "/Combined/GO_tests/"),
                     func_focus,
-<<<<<<< HEAD
-                    geneID2GO)
+                    geneid_to_go)
     })
     # map2(
     #   rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
@@ -211,21 +210,17 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
     #                          paste0(combos[1,x], ".vs.", combos[2,x]),
     #                          "_1point5FC.csv"),
     #   # need a column called "locusName", "adj.P.Val" and "logFC",
-    #   outDir = paste0(project_paths[3],"/Combined/GO_tests/")
+    #   out_dir = paste0(project_paths[3],"/Combined/GO_tests/")
     # )
-=======
-                    geneID2GO), error = function (e) return(NULL))
-    })
->>>>>>> ad9fc770770925387bf8ff0f03b858ee4198c645
   })
 
-  dataFolder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
+  data_folder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
 
   # make list of files
-  file_names <- list.files(path = dataFolder, pattern = "*.csv")
+  file_names <- list.files(path = data_folder, pattern = "*.csv")
 
   # make list of file paths
-  sample_paths <- file.path(dataFolder, file_names)
+  sample_paths <- file.path(data_folder, file_names)
 
   ############ split file names to match samples to keyfile
 
@@ -240,13 +235,13 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
   big_data <- unnest(data[which(!isEmpty(data$file_contents)),],
                      cols = c(file_contents))
 
-  sapply(1:length(combos[1,]), function (x) {
-    sapply(1:length(go_opts[, 1]), function (y) {
-      GO_plot_comparison(go_opts[y, 1],
-                           go_opts[y, 2],
-                           paste0(combos[1,x], ".vs.", combos[2,x]),
-                           big_data,
-                           dataFolder)
-    })
+  sapply(1:combos[1, ], function (x) {
+    map2(
+      rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
+      analyse_topGo,
+      test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
+      big_data   = big_data,
+      data_folder = data_folder
+    )
   })
 }
