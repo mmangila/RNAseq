@@ -8,6 +8,22 @@ find_de_edger <- function(old_dge,
 
   dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
 
+
+  design <- eval(parse(text = paste0(
+    "model.matrix(~ 0 + ",
+    group,
+    ", data = keyfile)"
+  )))
+  group_levels <- eval(parse(
+    text = paste0(
+      "levels(as.factor(keyfile$",
+      group,
+      "))"
+    )
+  ))
+
+  colnames(design) <- group_levels
+
   if (surrogate_variable) {
     dat    <- cpm(dge)
     mod    <- eval(parse(text = paste0(
@@ -20,18 +36,14 @@ find_de_edger <- function(old_dge,
     ddssva <- dge
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
-    eval(parse(text = paste("design(ddssva) <- ~ SV1 + SV2 +", group)))
+    design <- eval(parse(text = paste("model.matrix(~ 0 + ", group,
+                                      " + SV1 + SV2",
+                                      ", data = keyfile")))
+    colnames(design)[seq_along(group_levels)] <- group_levels
     dge <- ddssva
   }
 
-  design <- eval(parse(text =  paste0("model.matrix(~ 0 + ",
-                                      group,
-                                      ", data = keyfile)")))
-  colnames(design) <- eval(parse(
-    text = paste0("levels(as.factor(keyfile$",
-                  group,
-                  "))")
-  ))
+
   v   <- limma::voomLmFit(dge,
                           design,
                           plot = TRUE, sample.weights = surrogate_variable)
