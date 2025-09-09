@@ -1,30 +1,52 @@
-find_de_deseq <- function (dge.DESeq, keyfile, group, padj, paths, fcShrink) {
+find_de_deseq <- function(dge_deseq,
+                          keyfile,
+                          group,
+                          padj,
+                          paths,
+                          fc_shrink,
+                          surrogate_variable) {
 
   print("Preparing DESEQ2 data.")
-  dge.DESeq$samples$lib.size <- colSums(
-    dge.DESeq$counts
+  dge_deseq$samples$lib.size <- colSums(
+    dge_deseq$counts
   )
 
   dds <- eval(parse(text = paste0(
     "DESeqDataSetFromMatrix(",
-    "countData = dge.DESeq$counts,",
+    "countData = dge_deseq$counts,",
     "colData = keyfile,",
     "design= ~ ",
-    group,")"
+    group, ")"
   )))
 
-  dds <- DESeq(dds)
+  if (surrogate_variable) {
+    dat <- counts(dds)
+    mod <- eval(parse(text = paste0(
+      "model.matrix(~ ",
+      group,
+      ", colData(dds))"
+    )))
+    mod0 <- model.matrix(~ 1, colData(dds))
+    svseq <- sva::svaseq(dat, mod, mod0, n.sv = 2)
+    ddssva <- dds
+    ddssva$SV1 <- svseq$sv[, 1]
+    ddssva$SV2 <- svseq$sv[, 2]
+    eval(parse(text = paste("design(ddssva) <- ~ SV1 + SV2 +", group)))
+    dds <- ddssva
+  }
 
-  print(resultsNames(dds)) # lists the coefficients
+  dds <- DESeq2::DESeq(dds)
+
+  print(DESeq2::resultsNames(dds)) # lists the coefficients
 
   print("Begin PCA")
   de_deseq_pca(dds, group, paths)
-  print("Creating gene tables.")
-  de_deseq_tables(keyfile, group, dds, padj, paths, fcShrink)
+  print("Creating gene tables")
+  de_deseq_tables(keyfile, group, dds, padj, paths, fc_shrink)
 
 }
 
-de_deseq_tables <- function (keyfile, group, dds, padj, paths, fcShrink) {
+de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
 
   combos <- eval(
     parse(
@@ -36,123 +58,114 @@ de_deseq_tables <- function (keyfile, group, dds, padj, paths, fcShrink) {
     )
   )
 
-  out.base <- paste0(paths[3],
-                     "/DESEQ2/DE_tables/"
-  )
+  out_base <- paste0(paths[3],
+                     "/DESEQ2/DE_tables/")
   ##
-  dir.create(out.base,
-             recursive=T,
-             showWarnings = F
-  )
-  lfc.suffixes <- data.frame(
-    Level = c(0,1.5,2),
+  dir.create(out_base, recursive = TRUE, showWarnings = FALSE)
+  lfc_suffixes <- data.frame(
+    Level = c(0, 1.5, 2),
     Suffix = c("_detags.csv",
                "_detags_1point5FC.csv",
-               "_detags_2FC.csv"
-    )
+               "_detags_2FC.csv")
   )
 
-  sapply(1:length(combos[1,]), function (x) {
-    test.name <- paste0(
-      combos[1,x],
+  sapply(seq_along(combos[1, ]), function(x) {
+    test_name <- paste0(
+      combos[1, x],
       ".vs.",
-      combos[2,x]
+      combos[2, x]
     )
-    test.base.dir <- paste0(out.base,
-                            test.name,
+    test_base_dir <- paste0(out_base,
+                            test_name,
                             "/")
-    dir.create(test.base.dir, showWarnings=F)
-    de.genes  <- results(
+    dir.create(test_base_dir, showWarnings = FALSE)
+    de_genes  <- results(
       dds,
       contrast = c(group,
-                   as.character(combos[2,x]),
-                   as.character(combos[1,x])),
+                   as.character(combos[2, x]),
+                   as.character(combos[1, x])),
       alpha = 0.99999
     )
 
-    if (fcShrink == TRUE) {
-      de.genes <- lfcShrink(dds,
-                            contrast = c(group,
-                                         as.character(combos[2,x]),
-                                         as.character(combos[1,x])),
-                            res = de.genes,
-                            type="ashr")
+    if (fc_shrink == TRUE) {
+      de_genes <- lfc_shrink(dds,
+                             contrast = c(group,
+                                          as.character(combos[2, x]),
+                                          as.character(combos[1, x])),
+                             res      = de_genes,
+                             type     = "ashr")
     }
-    de.genes$X <- rownames(de.genes)
+    de_genes$X <- rownames(de_genes)
 
-    write_csv(as.data.frame(de.genes),
-              file = paste0(test.base.dir,
-                            test.name,
-                            "_alltags.csv"
-              )
-    )
+    write_csv(as.data.frame(de_genes),
+              file = paste0(test_base_dir,
+                            test_name,
+                            "_alltags.csv"))
 
-    pdf(paste0(test.base.dir,test.name,"_volcano.pdf"), width = 5, height = 3.5)
-      print(EnhancedVolcano(de.genes,
-                            lab = rownames(de.genes),
-                            x = 'log2FoldChange',
-                            y = 'pvalue'))
+    pdf(paste0(test_base_dir,test_name,"_volcano.pdf"), width = 5, height = 3.5)
+    print(EnhancedVolcano(de_genes,
+                          lab = rownames(de_genes),
+                          x = "log2FoldChange",
+                          y = "pvalue"))
     dev.off()
 
-    sapply(1:3, function (x) {
-      de.genes.sigs <- filter.de.set(
-        de.genes,
-        lfc.suffixes[x,1],
+    sapply(1:3, function(x) {
+      de_genes_sigs <- filter_de_set(
+        de_genes,
+        lfc_suffixes[x, 1],
         padj
       )
-      write_csv(as.data.frame(de.genes.sigs),
-                file = paste0(test.base.dir,
-                              test.name,
-                              lfc.suffixes[x,2]))
+      write_csv(as.data.frame(de_genes_sigs),
+                file = paste0(test_base_dir,
+                              test_name,
+                              lfc_suffixes[x, 2]))
     })
   })
 }
 
-de_deseq_pca <- function (dds, group, paths) {
-  vsd <- rlog(dds, blind=FALSE)
+de_deseq_pca <- function(dds, group, paths) {
+  vsd <- rlog(dds, blind = FALSE)
   print(head(assay(vsd), 3))
-  pcaData <- plotPCA(vsd, intgroup=c(group), returnData = TRUE)
-  percentVar <- round(100 * attr(pcaData, "percentVar"))
-  print(percentVar)
+  pca_data <- plotPCA(vsd, intgroup = c(group), returnData = TRUE)
+  percent_var <- round(100 * attr(pca_data, "percent_var"))
+  print(percent_var)
 
-  pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA_all_labels.pdf"), width = 5, height = 3.5)
-  print(ggplot(
-    pcaData,
-    aes(PC1, PC2, color=group)
-    ) +
-    geom_point(size=3) +
+  pdf(paste0(paths[3], "/MDS/deseq2_e-counts_PCA_all_labels.pdf"),
+      width = 5, height = 3.5)
+  print(ggplot(pca_data,
+               aes(PC1, PC2, color = group)) +
+    geom_point(size = 3) +
     xlab(
-      paste0("PC1: ",percentVar[1],"% variance")
-      ) +
+      paste0("PC1: ", percent_var[1], "% variance")
+    ) +
     ylab(
-      paste0("PC2: ",percentVar[2],"% variance")
-      ) +
+      paste0("PC2: ",percent_var[2],"% variance")
+    ) +
     geom_text_repel(aes(label = name)))
   dev.off()
 
-  pdf(paste0(paths[3],"/MDS/deseq2_e-counts_PCA.pdf"), width = 5, height = 3.5)
-  print(ggplot(
-    pcaData,
-    aes(PC1, PC2, color=group)
-    ) +
-    geom_point(size=3) +
+  pdf(paste0(paths[3], "/MDS/deseq2_e-counts_PCA.pdf"),
+      width = 5, height = 3.5)
+  print(ggplot(pca_data,
+               aes(PC1, PC2, color = group)) +
+    geom_point(size = 3) +
     xlab(
-      paste0("PC1: ",percentVar[1],"% variance")
-      ) +
+      paste0("PC1: ", percent_var[1], "% variance")
+    ) +
     ylab(
-      paste0("PC2: ",percentVar[2],"% variance")
-      ))
+      paste0("PC2: ", percent_var[2], "% variance")
+    ))
   dev.off()
 }
 
 
-filter.de.set <- function(deset, lfc = 0, padj = 0.05) {
-  filtered.de.set <- deset[
+filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
+  filtered_de_set <- deset[
     which(
       deset$log2FoldChange > lfc &
         deset$padj < padj
     ),
-    ]
+  ]
 
-  return(filtered.de.set)
+  return(filtered_de_set)
 }

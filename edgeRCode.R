@@ -1,49 +1,70 @@
-find_de_edger <- function (old.dge, group, keyfile, paths, analysis, padj) {
-  dge <- calcNormFactors(old.dge, method="TMM")
-  design <- eval(parse(text = paste0('model.matrix(~0 + ',
-                                     group,
-                                     ', data = keyfile)')))
-  colnames(design) <- eval(parse(text = paste0("levels(as.factor(keyfile$",group,"))")))
-  v <- voom(dge,design,plot=TRUE)
-  fit <- lmFit(v,design)
-  fit <- eBayes(fit)
+find_de_edger <- function(old_dge,
+                          group,
+                          keyfile,
+                          paths,
+                          analysis,
+                          surrogate_variable,
+                          padj) {
+  dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
+  design <- eval(parse(text =  paste0("model.matrix(~ 0 + ",
+                                      group,
+                                      ", data = keyfile)")))
+  colnames(design) <- eval(parse(
+    text = paste0("levels(as.factor(keyfile$",
+                  group,
+                  "))")
+  ))
+  v   <- limma::voomLmFit(dge,
+                          design,
+                          plot = TRUE, sample.weights = surrogate_variable)
+  fit <- limma::eBayes(v)
 
-  #print("Begin MDS")
-  #de_edger_mds(dge, group, keyfile, paths, v)
+  print("Begin MDS")
+  de_edger_mds(dge, group, keyfile, paths, v)
+
   print("Begin PCA")
   de_edger_pca(v, group, keyfile, paths)
   print("Begin DE gene table generation")
-  gene.names <- as.character(rownames(dge$counts))
-  de_edger_tables(keyfile, group, fit, paths, design, gene.names, analysis, v, padj)
+  gene_names <- as.character(rownames(dge$counts))
+  de_edger_tables(keyfile,
+                  group,
+                  fit,
+                  paths,
+                  design,
+                  gene_names,
+                  analysis,
+                  v,
+                  padj)
 }
 
-de_edger_mds <- function (dge, group, keyfile, paths, v) {
-  SampleColours <- ptol_pal()(length(dge$samples$lib.size)/2)
+de_edger_mds <- function(dge, group, keyfile, paths, v) {
+  sample_colours <- ggthemes::ptol_pal()(length(dge$samples$lib.size) / 2)
   if (length(dge$samples$lib.size) %% 2 == 1) {
-    dddSampleColours <- c(rep(SampleColours, each=2), ptol_pal()(1))
+    ddd_sample_colours <- c(rep(sample_colours, each = 2),
+                            ggthemes::ptol_pal()(1))
   } else {
-    dddSampleColours <-c(rep(SampleColours, each=2))
+    ddd_sample_colours <- c(rep(sample_colours, each = 2))
   }
 
-  mds2 <- plotMDS.invisible(v, ndim=3)
+  mds2 <- plotmds_invisible(v, ndim = 3)
 
   # Make MDS plots
-  par(mfrow=c(2,2), ps=10)
-  sapply(1:length(combn(1:3,2)[1,]), function (x) {
+  par(mfrow = c(2, 2), ps = 10)
+  sapply(1:3, function(x) {
     with(mds2,
          eval(parse(text = paste0("plot(V",
-                                  combn(1:3,2)[1, x],
+                                  combn(1:3, 2)[1, x],
                                   ", V",
-                                  combn(1:3,2)[2, x],
+                                  combn(1:3, 2)[2, x],
                                   ", pch=16,",
-                                  " col=SampleColours, ",
+                                  " col=sample_colours, ",
                                   " cex=1,",
                                   "main='MDS plot',",
                                   "xlab='Leading logFC dim",
-                                  combn(1:3,2)[1, x],
+                                  combn(1:3, 2)[1, x],
                                   "',",
                                   "ylab='Leading logFC dim ",
-                                  combn(1:3,2)[2, x],
+                                  combn(1:3, 2)[2, x],
                                   "')"))))
 
   })
@@ -51,146 +72,150 @@ de_edger_mds <- function (dge, group, keyfile, paths, v) {
   mds2$group <- keyfile[, which(colnames(keyfile) == group)]
 
   with(mds2, {
-    s3d <- scatterplot3d(V1, V3, V2,
-                         color = dddSampleColours,
-                         pch=19,
-                         cex.symbols = 1.5,
-                         type="h",
-                         main="3D MDS plot",
-                         xlab="Leading logFC dim 1",
-                         ylab="Leading logFC dim 3",
-                         zlab="Leading logFC dim 2")
-    s3d.coords <- s3d$xyz.convert(V1, V3, V2)
-    text(s3d.coords$x,
-         s3d.coords$y,
-         labels=row.names(mds2),
-         cex=.5, pos=4)
+    s3d <-  scatterplot3d(V1, V3, V2,
+                          color       = ddd_sample_colours,
+                          pch         = 19,
+                          cex.symbols = 1.5,
+                          type        = "h",
+                          main        = "3D MDS plot",
+                          xlab        = "Leading logFC dim 1",
+                          ylab        = "Leading logFC dim 3",
+                          zlab        = "Leading logFC dim 2")
+    s3d_coords <- s3d$xyz.convert(V1, V3, V2)
+    text(s3d_coords$x,
+         s3d_coords$y,
+         labels = row.names(mds2),
+         cex = 0.5, pos = 4)
   })
 
-  par(mfrow=c(1,1))
+  par(mfrow = c(1, 1))
 
-  pdf(paste0(paths[3],"/MDS/voom_mds_3d.pdf"), width = 6.5, height = 6.5)
+  pdf(paste0(paths[3], "/MDS/voom_mds_3d.pdf"), width = 6.5, height = 6.5)
   with(mds2, {
-    s3d <- scatterplot3d(V1, V3, V2,
-                         pch=19,
-                         cex.axis = 0.5,
-                         cex.symbols = 1,
-                         cex.lab = 0.5,
-                         type="h",
-                         xlab="Leading logFC dim 1",
-                         ylab="Leading logFC dim 3",
-                         zlab="Leading logFC dim 2")
-    s3d.coords <- s3d$xyz.convert(V1, V3, V2)
-    text(s3d.coords$x,
-         s3d.coords$y,
-         labels=row.names(mds2),
-         cex=.25, pos=4)
+    s3d        <- scatterplot3d(V1, V3, V2,
+                                pch         = 19,
+                                cex.axis    = 0.5,
+                                cex.symbols = 1,
+                                cex.lab     = 0.5,
+                                type        = "h",
+                                xlab        = "Leading logFC dim 1",
+                                ylab        = "Leading logFC dim 3",
+                                zlab        = "Leading logFC dim 2")
+    s3d_coords <- s3d$xyz.convert(V1, V3, V2)
+    text(s3d_coords$x,
+         s3d_coords$y,
+         labels = row.names(mds2),
+         cex = 0.25, pos = 4)
   })
   dev.off()
 }
 
-de_edger_pca <- function (v, group, keyfile, paths) {
+de_edger_pca <- function(v, group, keyfile, paths) {
   voom_matrix <- v$E
 
-  CPM_tbl <- as_tibble(voom_matrix, rownames = "Gene")
+  cpm_tbl <- tibble::as_tibble(voom_matrix, rownames = "Gene")
 
   # replace NaN with NA? Nope there arent any...
-  which(is.na(CPM_tbl))
-  # CPM_tbl[is.na(CPM_tbl)] <- NA
+  which(is.na(cpm_tbl))
 
-  MDS_table <- plotMDS(CPM_tbl[,-1], plot = F, ndim = 5, top = 500)
-  # MDS_table <- plotMDS(v, plot = F, ndim = 5)
+  mds_table <- limma::plotMDS(cpm_tbl)
 
-  cmdscale_out <- as_tibble(MDS_table$cmdscale.out)
-
-  cmdscale_out <- cmdscale_out %>%
-    mutate(Sample_ID = colnames(v)) %>%
-    left_join(keyfile, by = "Sample_ID")
-
-  pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment.pdf"), width = 5, height = 3.5)
-  make_PCA_plots(Timepoint = "ALL", dot_colour = group, keyfile, CPM_tbl)
+  pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment.pdf"),
+      width = 5, height = 3.5)
+  make_PCA_plots(Timepoint = "ALL", dot_colour = group, keyfile, cpm_tbl)
   dev.off()
 
-  pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment_labels.pdf"), width = 10, height = 7)
+  pdf(paste0(paths[3],"/MDS/voom_e-counts_PCA_Treatment_labels.pdf"),
+      width = 10, height = 7)
   make_PCA_plots_large_labels(
     dot_colour = group,
-    CPM_tbl,
+    cpm_tbl,
     keyfile
     )
   dev.off()
 }
 
-de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, analysis, v, padj) {
+de_edger_tables <- function(keyfile,
+                            group,
+                            fit,
+                            paths,
+                            design,
+                            gene_names,
+                            analysis,
+                            v,
+                            padj) {
   combos <- eval(
     parse(
       text = paste0(
         "combn(as.data.frame(keyfile %>% distinct(",
         group,
         "))[,1],2)"
-        )
+      )
       )
   )
 
   inside <- vector(mode = "character")
-  inside2 <- sapply(1:length(combos[1,]), function (x) {
+  inside2 <- sapply(seq_along(combos[1, ]), function(x) {
     inside <- c(
       inside,
       paste0(
-        combos[1,x],
+        combos[1, x],
         ".vs.",
-        combos[2,x],
+        combos[2, x],
         " = ",
-        combos[1,x],
+        combos[1, x],
         " - ",
-        combos[2,x]
-        )
-      )
-    return(inside)
-    })
-  contrast.matrix <- eval(
-    parse(
-      text = paste0(
-        "makeContrasts(",
-        paste(inside2, collapse = ","),
-        ", levels = design)"
-        )
+        combos[2, x]
       )
     )
+  })
+  contrast_matrix <- eval(
+    parse(
+      text = paste0("makeContrasts(",
+                    paste(inside2, collapse = ","),
+                    ", levels = design)")
+    )
+  )
 
-  fit2 <- contrasts.fit(fit, contrast.matrix)
-  fit2 <- eBayes(fit2)
-  results <- decideTests(fit2)
-  results2FC <- decideTests(fit2, lfc = log2(2))
-  results1.5FC <- decideTests(fit2, lfc = log2(1.5))
+  fit2 <- limma::contrasts.fit(fit, contrast_matrix)
+  fit2 <- limma::eBayes(fit2)
 
-  print("summary(results)")
+  results      <- limma::decideTests(fit2)
+  results_2fc   <- limma::decideTests(fit2, lfc = log2(2))
+  results_1point5_fc <- limaa::decideTests(fit2, lfc = log2(1.5))
+
+  print("Differentially expressed genes")
   print(summary(results))
-  print("summary(results1.5FC)")
-  print(summary(results1.5FC))
-  print("summary(results2FC)")
-  print(summary(results2FC))
+  print("Differentially expressed genes with >1.5 fold change")
+  print(summary(results_1point5_fc))
+  print("Differentially expressed genes with >2 fold change")
+  print(summary(results_2fc))
 
-  DETableAll <- topTable(fit=fit2, number=Inf)
-  DETable2FC <- topTable(fit=fit2, number=Inf, lfc = 1)
+  de_table_all <- limma::topTable(fit = fit2, number = Inf)
+  de_table_2fc <- limma::topTable(fit = fit2, number = Inf, lfc = 1)
 
   coefs <- colnames(fit2$coefficients)
-  out.base <- paste0(paths[3],"/edgeR/DE_tables/")
-  dir.create(out.base, recursive=T, showWarnings = F)
+  out_base <- paste0(paths[3], "/edgeR/DE_tables/")
+  dir.create(out_base, recursive = TRUE, showWarnings = FALSE)
 
   for (comparison in coefs){
-    test.name <- comparison
-    test.base.dir <- paste0(out.base, test.name, "/")
-    dir.create(test.base.dir, showWarnings=F)
-    print(test.name)
+    test_name <- comparison
+    test_base_dir <- paste0(out_base, test_name, "/")
+    dir.create(test_base_dir, showWarnings=F)
+    print(test_name)
 
-    pdf(paste0(test.base.dir, test.name, "_volcano.pdf"))
-    plotTable <- topTable(fit=fit2, number=Inf, coef = comparison, sort.by = "logFC")
-    with(plotTable, plot(logFC, -(log(adj.P.Val)), pch = 16, cex = 0.3))
-    title(main=paste0("Foldchange vs FDR (adjusted p-value)", comparison), cex.main=0.5)
-    plotTable <- topTable(fit=fit2, number=Inf, coef=comparison, sort.by = "logFC", p.value = padj, lfc = log2(2))
-    # write if statement to account for when there are no DE genes
-    if(length(plotTable) > 0){
-      with(plotTable, points(logFC, -(log(adj.P.Val)), pch = 16,
+    pdf(paste0(test_base_dir, test_name, "_volcano.pdf"))
+    plot_table <- topTable(fit     = fit2,
+                          number  = Inf, coef = comparison, sort.by = "logFC")
+    with(plot_table, plot(logFC, -(log(adj.P.Val)), pch = 16, cex = 0.3))
+    title(main = paste0("Foldchange vs FDR (adjusted p-value)",
+                        comparison), cex.main = 0.5)
+    plot_table <- topTable(fit     = fit2,
+                          number  = Inf, coef = comparison, sort.by = "logFC",
+                          p.value = padj, lfc = log2(2))
+    # writ e if statement to accou nt for when there are no DE genes
+    if (length(plot_table) > 0) {
+      with(plot_table, points(logFC, -(log(adj.P.Val)), pch = 16,
                              col = "red", cex = 0.5))
       dev.off()
     } else {
@@ -198,75 +223,97 @@ de_edger_tables <- function (keyfile, group, fit, paths, design, gene.names, ana
     }
 
     results <- decideTests(fit2)
-    results2FC <- decideTests(fit2, lfc = log2(2))
-    results1.5FC <- decideTests(fit2, lfc = log2(1.5))
+    results_2fc <- decideTests(fit2, lfc = log2(2))
+    results_1point5_fc <- decideTests(fit2, lfc = log2(1.5))
 
-    pdf(paste0(test.base.dir, test.name, "_smear.pdf"))
+    pdf(paste0(test_base_dir, test_name, "_smear.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject = fit2,
-      resultsMatrix=results,
-      geneSetList = comparison,
+      MArrayLMobject  = fit2,
+      resultsMatrix   = results,
+      geneSetList     = comparison,
       geneSetListName = comparison,
-      inputList = comparison,
-      inputListName = paste0("Up-regulated genes", comparison)
+      inputList       = comparison,
+      inputListName   = paste0("Up-regulated genes", comparison)
     )
     dev.off()
 
-    pdf(paste0(test.base.dir, test.name, "_smear1point5FC.pdf"))
+    pdf(paste0(test_base_dir, test_name, "_smear1point5FC.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject = fit2,
-      resultsMatrix=results1.5FC,
-      geneSetList = comparison,
+      MArrayLMobject  = fit2,
+      resultsMatrix   = results_1point5_fc,
+      geneSetList     = comparison,
       geneSetListName = comparison,
-      inputList = comparison,
-      inputListName = paste0("Up-regulated genes (1.5FC)", comparison)
+      inputList       = comparison,
+      inputListName   = paste0("Up-regulated genes (1.5FC)", comparison)
     )
     dev.off()
 
-    pdf(paste0(test.base.dir, test.name, "_smear2FC.pdf"))
+    pdf(paste0(test_base_dir, test_name, "_smear2FC.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject = fit2,
-      resultsMatrix=results2FC,
-      geneSetList = comparison,
+      MArrayLMobject  = fit2,
+      resultsMatrix   = results_2fc,
+      geneSetList     = comparison,
       geneSetListName = comparison,
-      inputList = comparison,
-      inputListName = paste0("Up-regulated genes (2FC)", comparison)
+      inputList       = comparison,
+      inputListName   = paste0("Up-regulated genes (2FC)", comparison)
     )
     dev.off()
 
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison)
-    write.csv(tt, paste0(test.base.dir, test.name, "_alltags.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj)
-    write.csv(tt, paste0(test.base.dir, test.name, "_detags.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj, lfc = log2(1.5))
-    write.csv(tt, paste0(test.base.dir, test.name, "_detags_1point5FC.csv"))
-    tt <- topTable(fit=fit2, number=Inf, coef=comparison, p.value = padj, lfc = log2(2))
-    write.csv(tt, paste0(test.base.dir, test.name, "_detags_2FC.csv"))
+    tt <- topTable(fit = fit2, number = Inf, coef = comparison)
+    write.csv(tt, paste0(test_base_dir, test_name, "_alltags.csv"))
+    tt <- topTable(fit = fit2, number = Inf, coef = comparison,
+                   p.value = padj)
+    write.csv(tt, paste0(test_base_dir, test_name, "_detags.csv"))
+    tt <- topTable(fit = fit2, number = Inf, coef = comparison,
+                   p.value = padj, lfc = log2(1.5))
+    write.csv(tt, paste0(test_base_dir, test_name, "_detags_1point5FC.csv"))
+    tt <- topTable(fit = fit2, number = Inf, coef = comparison,
+                   p.value = padj, lfc = log2(2))
+    write.csv(tt, paste0(test_base_dir, test_name, "_detags_2FC.csv"))
   }
 
-  tests <- mclapply(coefs, function (x) topTable(fit=fit2, number=Inf, coef=x, sort.by = "none"))
+  tests <- mclapply(coefs,
+                    function (x) {
+                      topTable(fit     = fit2,
+                               number  = Inf,
+                               coef    = x,
+                               sort.by = "none")
+                    })
   names(tests) <- coefs
-  fc.matrix <- as.data.frame(sapply(tests, function (t) t$logFC, simplify = "array"))
-  fdr.matrix <- sapply(tests, function (t) t$adj.P.Val, simplify = "array")
-  #be careful that gene.names is in the correct order...
-  rownames(fc.matrix) <- gene.names
-  rownames(fdr.matrix) <- gene.names
-  write.csv(fc.matrix, file=paste0(out.base, analysis, "_fc.csv"))
-  write.csv(fdr.matrix, file=paste0(out.base, analysis, "_fdr.csv"))
+  fc_matrix <- as.data.frame(sapply(tests,
+                                    function(t) t$logFC, simplify = "array"))
+  fdr_matrix <- sapply(tests, function(t) t$adj.P.Val, simplify = "array")
+  #be careful that gene_names is in the correct order...
+  rownames(fc_matrix)  <- gene_names
+  rownames(fdr_matrix) <- gene_names
+  write.csv(fc_matrix,  file = paste0(out_base, analysis, "_fc.csv"))
+  write.csv(fdr_matrix, file = paste0(out_base, analysis, "_fdr.csv"))
 
-  tests.sig.2FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = padj, lfc = log2(2), number=Inf, coef=x, sort.by = "none"))
-  names(tests.sig.2FC) <- coefs
+  tests_sig_2fc <- mclapply(coefs,
+                            function(x) {
+                              topTable(fit     = fit2,
+                                       p.value = padj, lfc = log2(2),
+                                       number  = Inf, coef = x,
+                                       sort.by = "none")
+                            })
+  names(tests_sig_2fc) <- coefs
 
-  tests.sig.1.5FC <- mclapply(coefs, function (x) topTable(fit=fit2, p.value = padj, lfc = log2(1.5), number=Inf, coef=x, sort.by = "none"))
-  names(tests.sig.1.5FC) <- coefs
+  tests_sig_1point5fc <- mclapply(coefs,
+                                  function(x) {
+                                    topTable(fit     = fit2,
+                                             p.value = padj, lfc = log2(1.5),
+                                             number  = Inf, coef = x,
+                                             sort.by = "none")
+                              })
+  names(tests_sig_1point5fc) <- coefs
 
   cpm.matrix <- cpm(v)
-  write.csv(fdr.matrix, file=paste0(out.base, analysis, "_fdr.csv"))
+  write.csv(fdr_matrix, file = paste0(out_base, analysis, "_fdr.csv"))
 }
 
-plotMDS.invisible <- function(...){
+plotmds_invisible <- function(...) {
   ff <- tempfile()
-  png(filename=ff)
+  png(filename = ff)
   mds <- plotMDS(...)
   dev.off()
   unlink(ff)
@@ -277,18 +324,18 @@ plotMDS.invisible <- function(...){
 
 ######### PCA 1 FUNCTION - JUST DOTS - SMALL PDF
 
-make_PCA_plots <- function(Timepoint = "ALL", dot_colour, keyfile, CPM_tbl){
+make_PCA_plots <- function(Timepoint = "ALL", dot_colour, keyfile, cpm_tbl){
   # Timepoint = "ALL"
   # dot_colour = "Time"
 
   # If else to subset data by timepoint
   if(Timepoint == "ALL"){
 
-    TC_PCA <- pca(CPM_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
+    TC_PCA <- pca(cpm_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
 
   }else{
 
-    CPM_table_group <- CPM_tbl %>%
+    CPM_table_group <- cpm_tbl %>%
       gather(key = Sample_ID, value = log2CPM, -Gene) %>%
       left_join(keyfile, by = "Sample_ID")
 
@@ -400,15 +447,15 @@ make_PCA_plots <- function(Timepoint = "ALL", dot_colour, keyfile, CPM_tbl){
 ######### ######### ######### ######### #########
 ######### PCA 2 FUNCTION - labels - LARGE PDF
 
-make_PCA_plots_large_labels <- function(Timepoint = "ALL", dot_colour, keyfile, CPM_tbl){
+make_PCA_plots_large_labels <- function(Timepoint = "ALL", dot_colour, keyfile, cpm_tbl){
 
   if(Timepoint == "ALL"){
 
-    TC_PCA <- pca(CPM_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
+    TC_PCA <- pca(cpm_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
 
   }else{
 
-    CPM_table_group <- CPM_tbl %>%
+    CPM_table_group <- cpm_tbl %>%
       gather(key = Sample_ID, value = log2CPM, -Gene) %>%
       left_join(keyfile, by = "Sample_ID") %>%
       filter(Time == Timepoint)
@@ -517,11 +564,11 @@ make_PCA_plots_large_labels <- function(Timepoint = "ALL", dot_colour, keyfile, 
 }
 
 make_PCA_plots_large_labels <- function (dot_colour,
-                                         CPM_tbls = CPM_tbl,
+                                         cpm_tbls = cpm_tbl,
                                          keyfile) {
 
   TC_PCA <- pca(
-    CPM_tbls[,-1],
+    cpm_tbls[,-1],
     scale = "uv",
     center = T,
     nPcs = 3,

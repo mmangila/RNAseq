@@ -1,14 +1,13 @@
-lfc.suffixes <- data.frame(
-  Level = c(0,1.5,2),
-  Suffix = c("_detags.csv",
-             "_detags_1point5FC.csv",
-             "_detags_2FC.csv"
-  )
+lfc_suffixes <- data.frame(
+  Level  =  c(0, 1.5, 2),
+  Suffix =  c("_detags.csv",
+              "_detags_1point5FC.csv",
+              "_detags_2FC.csv")
 )
 
-find_de_combined <- function (combos,
-                              lfc.suffixes,
-                              combined.folder,
+find_de_combined <-  function(combos,
+                              lfc_suffixes,
+                              combined_folder,
                               annotation,
                               funcs,
                               func_focus,
@@ -29,7 +28,7 @@ find_de_combined <- function (combos,
       combos[2,x]
     )
 
-    dir.create(paste0(combined.folder,
+    dir.create(paste0(combined_folder,
                       "/DE_tables/",
                       test.name), showWarnings = FALSE)
 
@@ -43,9 +42,9 @@ find_de_combined <- function (combos,
     ))
 
 
-    colnames(edger.deset) <- paste("edger",
-                                   colnames(edger.deset),
-                                   sep = "_")
+    colnames(edger.deset) <-  paste("edger",
+                                    colnames(edger.deset),
+                                    sep = "_")
     colnames(edger.deset)[which(colnames(edger.deset) == "edger_X")] = "X"
 
     deseq.deset <- read.csv(paste0(
@@ -56,9 +55,9 @@ find_de_combined <- function (combos,
       test.name,
       "_alltags.csv"
     ))
-    colnames(deseq.deset) <- paste("deseq",
-                                   colnames(deseq.deset),
-                                   sep = "_")
+    colnames(deseq.deset) <-  paste("deseq",
+                                    colnames(deseq.deset),
+                                    sep = "_")
     colnames(deseq.deset)[which(colnames(deseq.deset) == "deseq_X")] = "X"
 
     sapply(1:3, function (y) {
@@ -68,7 +67,7 @@ find_de_combined <- function (combos,
         "Finding differentially expressed genes in ",
         test.name,
         " with a fold change greater than ",
-        lfc.suffixes[y,1], "."
+        lfc_suffixes[y,1], "."
       ))
 
       edger_genes <- try(read.csv(paste0(paths[3],
@@ -76,18 +75,18 @@ find_de_combined <- function (combos,
                                          test.name,
                                          "/",
                                          test.name,
-                                         lfc.suffixes[y,2]))$X)
+                                         lfc_suffixes[y,2]))$X)
 
       if ("try-error" %in% class(edger_genes)) {
         edger_genes <- vector()
       }
 
-      deseq_genes <- try(read.csv(paste0(paths[3],
-                                         "/DESEQ2/DE_tables/",
-                                         test.name,
-                                         "/",
-                                         test.name,
-                                         lfc.suffixes[y,2]))$X)
+      deseq_genes <-  try(read.csv(paste0(paths[3],
+                                          "/DESEQ2/DE_tables/",
+                                          test.name,
+                                          "/",
+                                          test.name,
+                                          lfc_suffixes[y,2]))$X)
 
       if ("try-error" %in% class(deseq_genes)) {
         deseq_genes <- vector()
@@ -98,7 +97,7 @@ find_de_combined <- function (combos,
           "Found no differentially expressed genes in ",
           test.name,
           " with a fold change greater than ",
-          lfc.suffixes[y,1], "."
+          lfc_suffixes[y,1], "."
         ))
       } else if (length(edger_genes) == 0) {
         comb_genes <- deseq_genes
@@ -117,10 +116,10 @@ find_de_combined <- function (combos,
       colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
       if (annotation) {
-        gene_funcs  <- funcs[which(funcs[,
-                                         which(colnames(funcs) == func_focus)]
-                                   %in% comb_genes),
-                             ]
+        gene_funcs  <- funcs[which(
+          funcs[, which(colnames(funcs) == func_focus)] %in%
+          comb_genes
+          ), ]
         final_table <- try(merge(data.table(gene_funcs,
                                             key = names(gene_funcs)),
                                  data.table(gene_table,
@@ -142,12 +141,12 @@ find_de_combined <- function (combos,
       if (length(final_table[,1]) > 0) {
         write_csv(
           final_table,
-          file = paste0(combined.folder,
+          file = paste0(combined_folder,
                         "/DE_tables/",
                         test.name,
                         "/",
                         test.name,
-                        lfc.suffixes[y,2]))
+                        lfc_suffixes[y,2]))
 
 
 
@@ -161,12 +160,12 @@ find_de_combined <- function (combos,
     colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
 
     if (annotation) {
-      gene_funcs  <- funcs[which(funcs[,
-                                       which(
-                                         colnames(funcs) == func_focus
-                                       )]
-                                 %in% union(deseq.deset$X,edger.deset$X)),
-                           ]
+      gene_funcs  <-  funcs[which(funcs[,
+                                        which(
+                                          colnames(funcs) == func_focus
+                                        )]
+                                  %in% union(deseq.deset$X,edger.deset$X)),
+                            ]
       final_table <- try(merge(data.table(gene_funcs,
                                           key = names(gene_funcs)),
                                data.table(gene_table,
@@ -176,7 +175,7 @@ find_de_combined <- function (combos,
     }
     write_csv(
       final_table,
-      file = paste0(combined.folder,
+      file = paste0(combined_folder,
                     "/DE_tables/",
                     test.name,
                     "/",
@@ -187,25 +186,25 @@ find_de_combined <- function (combos,
 }
 
 
-find_combined_de <- function(keyfile,
-                             group,
-                             lfc.suffixes,
-                             annotation,
-                             func_path,
-                             func_focus,
-                             paths,
-                             go) {
+find_combined_de <-  function(keyfile,
+                              group,
+                              lfc_suffixes,
+                              annotation,
+                              func_path,
+                              func_focus,
+                              paths,
+                              go) {
 
-  combined.folder <- paste0(
+  combined_folder <- paste0(
     paths[3],
     "/Combined"
   )
   dir.create(
-    combined.folder,
+    combined_folder,
     showWarnings = FALSE
   )
   dir.create(
-    paste0(combined.folder,"/DE_tables/"),
+    paste0(combined_folder,"/DE_tables/"),
     showWarnings = FALSE
   )
 
@@ -229,10 +228,10 @@ find_combined_de <- function(keyfile,
     }
   }
 
-  sink(file = paste0(combined.folder, "/DE_tables/de_genes_summary.txt"))
+  sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
   find_de_combined(combos,
-                   lfc.suffixes,
-                   combined.folder,
+                   lfc_suffixes,
+                   combined_folder,
                    annotation,
                    funcs,
                    func_focus,
