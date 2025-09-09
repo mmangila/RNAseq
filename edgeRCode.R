@@ -22,8 +22,6 @@ find_de_edger <- function(old_dge,
     )
   ))
 
-  colnames(design) <- group_levels
-
   if (surrogate_variable) {
     dat    <- cpm(dge)
     mod    <- eval(parse(text = paste0(
