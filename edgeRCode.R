@@ -31,10 +31,9 @@ find_de_edger <- function(old_dge,
     )))
     mod0   <- model.matrix(~ 1, data = keyfile)
     svseq  <- sva::svaseq(dat, mod, mod0, n.sv = 2)
+    colnames(svseq$sv) <- c("SV1", "SV2")
     design <- cbind(design, svseq$sv)
   }
-
-  print(design)
 
   v   <- edgeR::voomLmFit(dge,
                           design,
