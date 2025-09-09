@@ -36,13 +36,9 @@ find_de_edger <- function(old_dge,
     ddssva <- dge
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
-    design <- eval(parse(text = paste("model.matrix(~ 0 + ", group,
-                                      " + SV1 + SV2",
-                                      ", data = keyfile)")))
-    colnames(design)[seq_along(group_levels)] <- group_levels
+    design <- cbind(design, svseq$sv)
     dge <- ddssva
   }
-
 
   v   <- limma::voomLmFit(dge,
                           design,
