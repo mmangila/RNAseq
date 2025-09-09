@@ -116,7 +116,7 @@ analyse_rnaseq <-  function(project_folder,
       "Which column of the functional annotation is reflected in the featureCounts results? "
     )
   } else {
-    func_path <- NULL
+    func_path <- "None"
     func_focus <- "X"
   }
 
