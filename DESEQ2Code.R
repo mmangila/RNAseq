@@ -19,6 +19,8 @@ find_de_deseq <- function(dge_deseq,
     group, ")"
   )))
 
+  dds <- estimateSizeFactors(dds)
+
   if (surrogate_variable) {
     dat <- counts(dds, normalized = TRUE)
     mod <- eval(parse(text = paste0(
