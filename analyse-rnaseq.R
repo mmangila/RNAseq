@@ -127,15 +127,19 @@ analyse_rnaseq <-  function(project_folder,
   old_dge   <- filter.wrapper(keyfile, group, project_paths, annotation, func_path, func_focus)
   dge_deseq <- read.data(keyfile, group, project_paths)
 
+  # DESEQ2Code
+  print("Running DESeq2")
+  find_de_deseq(
+    dge_deseq, keyfile, group,
+    padj, project_paths, fc_shrink, surrogate_variable
+  )
+
   #edgeRCode
   print("Running edgeR")
   find_de_edger(old_dge, group, keyfile, project_paths, analysis,
                 surrogate_variable, padj)
 
-  #DESEQ2Code
-  print("Running DESeq2")
-  find_de_deseq(dge_deseq, keyfile, group,
-                padj, project_paths, fc_shrink, surrogate_variable)
+
 
   # Find the union
   print("Combining the analyses")
