@@ -19,8 +19,8 @@ find_de_edger <- function(old_dge,
                           plot = TRUE, sample.weights = surrogate_variable)
   fit <- limma::eBayes(v)
 
-  print("Begin MDS")
-  de_edger_mds(dge, group, keyfile, paths, v)
+  # print("Begin MDS")
+  # de_edger_mds(dge, group, keyfile, paths, v)
 
   print("Begin PCA")
   de_edger_pca(v, group, keyfile, paths)
@@ -111,7 +111,7 @@ de_edger_mds <- function(dge, group, keyfile, paths, v) {
 }
 
 de_edger_pca <- function(v, group, keyfile, paths) {
-  voom_matrix <- v$E
+  voom_matrix <- v$EList$E
 
   cpm_tbl <- tibble::as_tibble(voom_matrix, rownames = "Gene")
 
@@ -131,7 +131,7 @@ de_edger_pca <- function(v, group, keyfile, paths) {
     dot_colour = group,
     cpm_tbl,
     keyfile
-    )
+  )
   dev.off()
 }
 
@@ -151,7 +151,7 @@ de_edger_tables <- function(keyfile,
         group,
         "))[,1],2)"
       )
-      )
+    )
   )
 
   inside <- vector(mode = "character")
@@ -180,9 +180,9 @@ de_edger_tables <- function(keyfile,
   fit2 <- limma::contrasts.fit(fit, contrast_matrix)
   fit2 <- limma::eBayes(fit2)
 
-  results      <- limma::decideTests(fit2)
-  results_2fc   <- limma::decideTests(fit2, lfc = log2(2))
-  results_1point5_fc <- limaa::decideTests(fit2, lfc = log2(1.5))
+  results            <- limma::decideTests(fit2)
+  results_2fc        <- limma::decideTests(fit2, lfc = log2(2))
+  results_1point5_fc <- limma::decideTests(fit2, lfc = log2(1.5))
 
   print("Differentially expressed genes")
   print(summary(results))
@@ -201,29 +201,31 @@ de_edger_tables <- function(keyfile,
   for (comparison in coefs){
     test_name <- comparison
     test_base_dir <- paste0(out_base, test_name, "/")
-    dir.create(test_base_dir, showWarnings=F)
+    dir.create(test_base_dir, showWarnings = FALSE)
     print(test_name)
 
     pdf(paste0(test_base_dir, test_name, "_volcano.pdf"))
-    plot_table <- topTable(fit     = fit2,
-                          number  = Inf, coef = comparison, sort.by = "logFC")
+    plot_table <-  topTable(fit     = fit2,
+                            number  = Inf, coef = comparison,
+                            sort.by = "logFC")
     with(plot_table, plot(logFC, -(log(adj.P.Val)), pch = 16, cex = 0.3))
     title(main = paste0("Foldchange vs FDR (adjusted p-value)",
                         comparison), cex.main = 0.5)
-    plot_table <- topTable(fit     = fit2,
-                          number  = Inf, coef = comparison, sort.by = "logFC",
-                          p.value = padj, lfc = log2(2))
+    plot_table <-  topTable(fit     = fit2,
+                            number  = Inf, coef = comparison,
+                            sort.by = "logFC",
+                            p.value = padj, lfc = log2(2))
     # writ e if statement to accou nt for when there are no DE genes
     if (length(plot_table) > 0) {
       with(plot_table, points(logFC, -(log(adj.P.Val)), pch = 16,
-                             col = "red", cex = 0.5))
+                              col = "red", cex = 0.5))
       dev.off()
     } else {
       dev.off()
     }
 
-    results <- decideTests(fit2)
-    results_2fc <- decideTests(fit2, lfc = log2(2))
+    results            <- decideTests(fit2)
+    results_2fc        <- decideTests(fit2, lfc = log2(2))
     results_1point5_fc <- decideTests(fit2, lfc = log2(1.5))
 
     pdf(paste0(test_base_dir, test_name, "_smear.pdf"))
@@ -273,7 +275,7 @@ de_edger_tables <- function(keyfile,
   }
 
   tests <- mclapply(coefs,
-                    function (x) {
+                    function(x) {
                       topTable(fit     = fit2,
                                number  = Inf,
                                coef    = x,
@@ -304,10 +306,10 @@ de_edger_tables <- function(keyfile,
                                              p.value = padj, lfc = log2(1.5),
                                              number  = Inf, coef = x,
                                              sort.by = "none")
-                              })
+                                  })
   names(tests_sig_1point5fc) <- coefs
 
-  cpm.matrix <- cpm(v)
+  cpm_matrix <- cpm(v)
   write.csv(fdr_matrix, file = paste0(out_base, analysis, "_fdr.csv"))
 }
 
@@ -329,76 +331,81 @@ make_PCA_plots <- function(Timepoint = "ALL", dot_colour, keyfile, cpm_tbl){
   # dot_colour = "Time"
 
   # If else to subset data by timepoint
-  if(Timepoint == "ALL"){
+  if (Timepoint == "ALL") {
 
-    TC_PCA <- pca(cpm_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
+    tc_pca <- pca(cpm_tbl[,-1],
+                  scale = "uv",
+                  center = T,
+                  nPcs = 3,
+                  method = "nipals")
 
-  }else{
+  } else {
 
-    CPM_table_group <- cpm_tbl %>%
+    cpm_table_group <- cpm_tbl %>%
       gather(key = Sample_ID, value = log2CPM, -Gene) %>%
       left_join(keyfile, by = "Sample_ID")
 
-    CPM_table_group_spread <- CPM_table_group %>%
+    cpm_table_group_spread <- cpm_table_group %>%
       select(Gene, Sample_ID, log2CPM) %>%
       spread(key = Sample_ID, value = log2CPM)
 
-    PCA_input_table <- CPM_table_group_spread[,-1]
+    pca_input_table <- cpm_table_group_spread[, -1]
 
-    TC_PCA <- pca(PCA_input_table, scale = "uv", center = T, nPcs = 3, method = "nipals")
+    tc_pca <- pca(pca_input_table,
+                  scale = "uv",
+                  center = TRUE,
+                  nPcs = 3,
+                  method = "nipals")
   }
 
   # to get the variance (R2) explained by each axis
-  summary(TC_PCA)
-  PC1_v <- round(pull(as.tibble(summary(TC_PCA)), PC1)[1]*100, digits = 1)
-  PC2_v <- round(pull(as.tibble(summary(TC_PCA)), PC2)[1]*100, digits = 1)
-  PC3_v <- round(pull(as.tibble(summary(TC_PCA)), PC3)[1]*100, digits = 1)
+  summary(tc_pca)
+  pc1_v <- round(pull(as_tibble(summary(tc_pca)), PC1)[1] * 100, digits = 1)
+  pc2_v <- round(pull(as_tibble(summary(tc_pca)), PC2)[1] * 100, digits = 1)
+  pc3_v <- round(pull(as_tibble(summary(tc_pca)), PC3)[1] * 100, digits = 1)
 
-  PCA_loadings <- as.tibble(loadings(TC_PCA)) %>%
-    mutate(Sample_ID = row.names(loadings(TC_PCA))) %>%
+  pca_loadings <- as_tibble(loadings(tc_pca)) %>%
+    mutate(Sample_ID = row.names(loadings(tc_pca))) %>%
     left_join(keyfile, by = "Sample_ID")
 
   ### plots PC1 vs PC2
-  g <- ggplot(
-    PCA_loadings,
-    aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))
-    ) +
-    geom_point() +
-    scale_colour_ptol() +
-    theme_classic() +
-    labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC2 (", PC2_v, "%)"))
+  g <- ggplot(pca_loadings,
+              aes(x = PC1, y = PC2,
+                  colour = as.character(!!as.name(dot_colour)))) +
+        geom_point() +
+        scale_colour_ptol() +
+        theme_classic() +
+        labs(title = paste0("Timepoint ", Timepoint, " hr"),
+             x     = paste0("PC1 (", pc1_v, "%)"),
+             y     = paste0("PC2 (", pc2_v, "%)"))
   print(g)
 
   # add text labels
-  g_labs <- g + geom_text_repel(aes(label=Sample_ID), show.legend = F)
-  # print(g_labs)
+  g_labs <- g + geom_text_repel(aes(label = Sample_ID), show.legend = FALSE)
 
-  g <- ggplot(
-    PCA_loadings,
-    aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))
-    ) +
-    geom_point() +
-    theme_classic() +
-    scale_colour_ptol() +
-    labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC2 (", PC2_v, "%)")) +
-    coord_equal()
+  g <- ggplot(pca_loadings,
+              aes(x = PC1, y = PC2,
+                  colour = as.character(!!as.name(dot_colour)))) +
+         geom_point() +
+         theme_classic() +
+         scale_colour_ptol() +
+         labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
+              x = paste0("PC1 (", pc1_v, "%)"),
+              y = paste0("PC2 (", pc2_v, "%)")) +
+         coord_equal()
   print(g)
 
   ### plots PC1 vs PC3
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))
     ) +
     geom_point() +
     scale_colour_ptol() +
     theme_classic() +
     labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)"))
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)"))
   print(g)
 
   # add text labels
@@ -406,39 +413,39 @@ make_PCA_plots <- function(Timepoint = "ALL", dot_colour, keyfile, cpm_tbl){
   # print(g_labs)
 
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))
     ) +
     geom_point() +
     theme_classic() +
     scale_colour_ptol() +
     labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)")) +
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)")) +
     coord_equal()
   print(g)
 
   ### plots PC2 vs PC3
-  g <- ggplot(PCA_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     scale_colour_ptol() +
     theme_classic() +
     labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC2 (", PC2_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)"))
+         x = paste0("PC2 (", pc2_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)"))
   print(g)
 
   # add text labels
   g_labs <- g + geom_text_repel(aes(label=Sample_ID), show.legend = F)
   # print(g_labs)
 
-  g <- ggplot(PCA_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     theme_classic() +
     scale_colour_ptol() +
     labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC2 (", PC2_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)")) +
+         x = paste0("PC2 (", pc2_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)")) +
     coord_equal()
   print(g)
 }
@@ -451,114 +458,114 @@ make_PCA_plots_large_labels <- function(Timepoint = "ALL", dot_colour, keyfile, 
 
   if(Timepoint == "ALL"){
 
-    TC_PCA <- pca(cpm_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
+    tc_pca <- pca(cpm_tbl[,-1], scale = "uv", center = T, nPcs = 3, method = "nipals")
 
   }else{
 
-    CPM_table_group <- cpm_tbl %>%
+    cpm_table_group <- cpm_tbl %>%
       gather(key = Sample_ID, value = log2CPM, -Gene) %>%
       left_join(keyfile, by = "Sample_ID") %>%
       filter(Time == Timepoint)
 
-    CPM_table_group_spread <- CPM_table_group %>%
+    cpm_table_group_spread <- cpm_table_group %>%
       select(Gene, Sample_ID, log2CPM) %>%
       spread(key = Sample_ID, value = log2CPM)
 
-    PCA_input_table <- CPM_table_group_spread[,-1]
+    pca_input_table <- cpm_table_group_spread[,-1]
 
-    TC_PCA <- pca(PCA_input_table, scale = "uv", center = T, nPcs = 3, method = "nipals")
+    tc_pca <- pca(pca_input_table, scale = "uv", center = T, nPcs = 3, method = "nipals")
   }
 
-  slplot(TC_PCA, scoresLoadings = c(T,T))
+  slplot(tc_pca, scoresLoadings = c(T,T))
 
   # this plot displays the cumulative variance explained by PC1 and PC2
-  plotPcs(TC_PCA, type = c("loadings"))
+  plotPcs(tc_pca, type = c("loadings"))
 
-  # scores(TC_PCA)
+  # scores(tc_pca)
 
   # to get the variance (R2) explained by each axis
-  summary(TC_PCA)
-  PC1_v <- round(pull(as.tibble(summary(TC_PCA)), PC1)[1]*100, digits = 1)
-  PC2_v <- round(pull(as.tibble(summary(TC_PCA)), PC2)[1]*100, digits = 1)
-  PC3_v <- round(pull(as.tibble(summary(TC_PCA)), PC3)[1]*100, digits = 1)
+  summary(tc_pca)
+  pc1_v <- round(pull(as_tibble(summary(tc_pca)), PC1)[1]*100, digits = 1)
+  pc2_v <- round(pull(as_tibble(summary(tc_pca)), PC2)[1]*100, digits = 1)
+  pc3_v <- round(pull(as_tibble(summary(tc_pca)), PC3)[1]*100, digits = 1)
 
-  PCA_loadings <- as.tibble(loadings(TC_PCA)) %>%
-    mutate(Sample_ID = row.names(loadings(TC_PCA))) %>%
+  pca_loadings <- as_tibble(loadings(tc_pca)) %>%
+    mutate(Sample_ID = row.names(loadings(tc_pca))) %>%
     left_join(keyfile, by = "Sample_ID")
 
   ### set colour scheme if present in the sample.key
-  # cat_colour_names <- pull(PCA_loadings, colour)
-  # names(cat_colour_names) <- pull(PCA_loadings, Descriptive_ID)
+  # cat_colour_names <- pull(pca_loadings, colour)
+  # names(cat_colour_names) <- pull(pca_loadings, Descriptive_ID)
 
   ### plots PC1 vs PC2
-  g <- ggplot(PCA_loadings, aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     scale_colour_ptol() +
     theme_classic() +
     labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC2 (", PC2_v, "%)"))
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC2 (", pc2_v, "%)"))
   print(g)
 
   # add text labels
   g_labs <- g + geom_text_repel(aes(label=Sample_ID), show.legend = F)
   print(g_labs)
 
-  g <- ggplot(PCA_loadings, aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC1, y = PC2, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     theme_classic() +
     scale_colour_ptol() +
     labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC2 (", PC2_v, "%)")) +
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC2 (", pc2_v, "%)")) +
     coord_equal()
   print(g)
 
   ### plots PC1 vs PC3
-  g <- ggplot(PCA_loadings, aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     scale_colour_ptol() +
     theme_classic() +
     labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)"))
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)"))
   print(g)
 
   # add text labels
   g_labs <- g + geom_text_repel(aes(label=Sample_ID), show.legend = F)
   print(g_labs)
 
-  g <- ggplot(PCA_loadings, aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC1, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     theme_classic() +
     scale_colour_ptol() +
     labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC1 (", PC1_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)")) +
+         x = paste0("PC1 (", pc1_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)")) +
     coord_equal()
   print(g)
 
   ### plots PC2 vs PC3
-  g <- ggplot(PCA_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     scale_colour_ptol() +
     theme_classic() +
     labs(title = paste0("Timepoint ", Timepoint, " hr"),
-         x = paste0("PC2 (", PC2_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)"))
+         x = paste0("PC2 (", pc2_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)"))
   print(g)
 
   # add text labels
   g_labs <- g + geom_text_repel(aes(label=Sample_ID), show.legend = F)
   print(g_labs)
 
-  g <- ggplot(PCA_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
+  g <- ggplot(pca_loadings, aes(x = PC2, y = PC3, colour = as.character(!!as.name(dot_colour)))) +
     geom_point() +
     theme_classic() +
     scale_colour_ptol() +
     labs(title = paste0("Timepoint ", Timepoint, " hr - coord prop"),
-         x = paste0("PC2 (", PC2_v, "%)"),
-         y = paste0("PC3 (", PC3_v, "%)")) +
+         x = paste0("PC2 (", pc2_v, "%)"),
+         y = paste0("PC3 (", pc3_v, "%)")) +
     coord_equal()
   print(g)
 }
@@ -567,7 +574,7 @@ make_PCA_plots_large_labels <- function (dot_colour,
                                          cpm_tbls = cpm_tbl,
                                          keyfile) {
 
-  TC_PCA <- pca(
+  tc_pca <- pca(
     cpm_tbls[,-1],
     scale = "uv",
     center = T,
@@ -575,44 +582,44 @@ make_PCA_plots_large_labels <- function (dot_colour,
     method = "nipals"
   )
 
-  slplot(TC_PCA, scoresLoadings = c(T,T))
+  slplot(tc_pca, scoresLoadings = c(T,T))
 
   # this plot displays the cumulative variance explained by PC1 and PC2
-  plotPcs(TC_PCA, type = c("loadings"))
+  plotPcs(tc_pca, type = c("loadings"))
 
   # to get the variance (R2) explained by each axis
-  summary(TC_PCA)
-  PC1_v <- round(
+  summary(tc_pca)
+  pc1_v <- round(
     pull(
-      as.tibble(summary(TC_PCA)),
+      as_tibble(summary(tc_pca)),
       PC1
     )[1] * 100,
     digits = 1
   )
-  PC2_v <- round(
+  pc2_v <- round(
     pull(
-      as.tibble(summary(TC_PCA)),
+      as_tibble(summary(tc_pca)),
       PC2
     )[1] * 100,
     digits = 1
   )
-  PC3_v <- round(
+  pc3_v <- round(
     pull(
-      as.tibble(summary(TC_PCA)),
+      as_tibble(summary(tc_pca)),
       PC3
     )[1] * 100,
     digits = 1
   )
 
-  PCA_loadings <- as.tibble(loadings(TC_PCA)) %>%
+  pca_loadings <- as_tibble(loadings(tc_pca)) %>%
     mutate(
-      Sample_ID = row.names(loadings(TC_PCA))
+      Sample_ID = row.names(loadings(tc_pca))
     ) %>%
     left_join(keyfile, by = "Sample_ID")
 
   ### plots PC1 vs PC2
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC1,
       y = PC2,
@@ -623,8 +630,8 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     theme_classic() +
     labs(
-      x = paste0("PC1 (", PC1_v, "%)"),
-      y = paste0("PC2 (", PC2_v, "%)")
+      x = paste0("PC1 (", pc1_v, "%)"),
+      y = paste0("PC2 (", pc2_v, "%)")
     )
   print(g)
 
@@ -637,7 +644,7 @@ make_PCA_plots_large_labels <- function (dot_colour,
   print(g_labs)
 
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC1,
       y = PC2,
@@ -649,15 +656,15 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     labs(
       title = "Coordinate prop",
-      x = paste0("PC1 (", PC1_v, "%)"),
-      y = paste0("PC2 (", PC2_v, "%)")
+      x = paste0("PC1 (", pc1_v, "%)"),
+      y = paste0("PC2 (", pc2_v, "%)")
     ) +
     coord_equal()
   print(g)
 
   ### plots PC1 vs PC3
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC1,
       y = PC3,
@@ -668,8 +675,8 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     theme_classic() +
     labs(
-      x = paste0("PC1 (", PC1_v, "%)"),
-      y = paste0("PC3 (", PC3_v, "%)")
+      x = paste0("PC1 (", pc1_v, "%)"),
+      y = paste0("PC3 (", pc3_v, "%)")
     )
   print(g)
 
@@ -682,7 +689,7 @@ make_PCA_plots_large_labels <- function (dot_colour,
   print(g_labs)
 
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC1,
       y = PC3,
@@ -694,15 +701,15 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     labs(
       title = "Coordinate prop",
-      x = paste0("PC1 (", PC1_v, "%)"),
-      y = paste0("PC3 (", PC3_v, "%)")
+      x = paste0("PC1 (", pc1_v, "%)"),
+      y = paste0("PC3 (", pc3_v, "%)")
     ) +
     coord_equal()
   print(g)
 
   ### plots PC2 vs PC3
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC2,
       y = PC3,
@@ -713,8 +720,8 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     theme_classic() +
     labs(
-      x = paste0("PC2 (", PC2_v, "%)"),
-      y = paste0("PC3 (", PC3_v, "%)")
+      x = paste0("PC2 (", pc2_v, "%)"),
+      y = paste0("PC3 (", pc3_v, "%)")
     )
   print(g)
 
@@ -727,7 +734,7 @@ make_PCA_plots_large_labels <- function (dot_colour,
   print(g_labs)
 
   g <- ggplot(
-    PCA_loadings,
+    pca_loadings,
     aes(
       x = PC2,
       y = PC3,
@@ -739,8 +746,8 @@ make_PCA_plots_large_labels <- function (dot_colour,
     scale_colour_ptol() +
     labs(
       title = "Coordinate prop",
-      x = paste0("PC2 (", PC2_v, "%)"),
-      y = paste0("PC3 (", PC3_v, "%)")
+      x = paste0("PC2 (", pc2_v, "%)"),
+      y = paste0("PC3 (", pc3_v, "%)")
     ) +
     coord_equal()
   print(g)

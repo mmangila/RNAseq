@@ -182,7 +182,11 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
 
   sapply(1:length(combos[1, ]), function (x) {
     sapply(1:length(go_opts[, 1]), function (y) {
+<<<<<<< HEAD
       analyse_topGo(as.character(go_opts[y, 1]),
+=======
+      tryCatch(analyse_topGo(as.character(go_opts[y, 1]),
+>>>>>>> ad9fc770770925387bf8ff0f03b858ee4198c645
                     as.character(go_opts[y, 2]),
                     paste0(combos[1,x], ".vs.", combos[2,x]),
                     paste0(project_paths[3],
@@ -193,6 +197,7 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
                            "_detags_1point5FC.csv"),
                     paste0(project_paths[3],"/Combined/GO_tests/"),
                     func_focus,
+<<<<<<< HEAD
                     geneID2GO)
     })
     # map2(
@@ -208,6 +213,10 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
     #   # need a column called "locusName", "adj.P.Val" and "logFC",
     #   outDir = paste0(project_paths[3],"/Combined/GO_tests/")
     # )
+=======
+                    geneID2GO), error = function (e) return(NULL))
+    })
+>>>>>>> ad9fc770770925387bf8ff0f03b858ee4198c645
   })
 
   dataFolder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
@@ -231,13 +240,13 @@ analyse_go <- function (funcs, func_focus, project.folder, combos, project_paths
   big_data <- unnest(data[which(!isEmpty(data$file_contents)),],
                      cols = c(file_contents))
 
-  sapply(1:combos[1,], function (x) {
-    map2(
-      rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-      analyse_topGo,
-      test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
-      big_data   = big_data,
-      dataFolder = dataFolder
-    )
+  sapply(1:length(combos[1,]), function (x) {
+    sapply(1:length(go_opts[, 1]), function (y) {
+      GO_plot_comparison(go_opts[y, 1],
+                           go_opts[y, 2],
+                           paste0(combos[1,x], ".vs.", combos[2,x]),
+                           big_data,
+                           dataFolder)
+    })
   })
 }
