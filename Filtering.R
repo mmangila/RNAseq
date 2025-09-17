@@ -85,7 +85,7 @@ assignment_summary <- function(paths, keyfile) {
 
   plot_colours   <- rev(
     c("black", "grey",
-      viridis_pal(option = "C")(n = length(keyfile[, 1])))
+      viridis_pal(option = "C")(n = length(levels(plot_data$Var2))))
   )
 
   print("Proportional mapped plot")
