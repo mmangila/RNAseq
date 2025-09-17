@@ -42,11 +42,11 @@ lfc_suffixes <- data.frame(
 analyse_rnaseq <-  function(project_folder,
                             analysis,
                             group,
-                            batch = vector(mode = "character"),
                             padj,
                             mapman_focus,
                             annotation = FALSE, go = FALSE, fc_shrink = FALSE,
-                            surrogate_variable = FALSE) {
+                            surrogate_variable = FALSE,
+                            batch = vector(mode = "character")) {
 
   bioconductor_libs <-  c("edgeR",
                           "limma",
