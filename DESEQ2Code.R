@@ -37,7 +37,7 @@ find_de_deseq <- function(dge_deseq,
     )))
     mod0 <- model.matrix(~ 1, colData(dds))
 
-    svseq <- sva::svaseq(dat, mod, mod0, n.sv = 2)
+    svseq <- sva::svaseq(dat, mod, mod0)
     ddssva <- dds
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
