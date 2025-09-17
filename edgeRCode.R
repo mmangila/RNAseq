@@ -10,7 +10,7 @@ find_de_edger <- function(old_dge,
   print("Calculating normalisation factors")
   dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
 
-
+  print(batch_design)
   design <- eval(parse(text = paste0(
     "model.matrix(~ 0 + ",
     group, batch_design,
