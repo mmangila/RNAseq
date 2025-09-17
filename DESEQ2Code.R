@@ -1,6 +1,7 @@
 find_de_deseq <- function(dge_deseq,
                           keyfile,
                           group,
+                          batch_design,
                           padj,
                           paths,
                           fc_shrink,
@@ -33,7 +34,7 @@ find_de_deseq <- function(dge_deseq,
     ddssva <- dds
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
-    eval(parse(text = paste("design(ddssva) <- ~ SV1 + SV2 +", group)))
+    design(ddssva) <- eval(parse(text = paste("~ SV1 + SV2 +", group)))
     dds <- ddssva
   }
 

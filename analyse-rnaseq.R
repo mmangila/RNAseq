@@ -136,20 +136,24 @@ analyse_rnaseq <-  function(project_folder,
 
   batch_design <- paste(c(group, batch), collapse = " + ")
 
-  # DESEQ2Code
-  #print("Running DESeq2")
-  #find_de_deseq(
-  #  dge_deseq,
-  #  keyfile, group, batch_design,
-  #  padj, project_paths, fc_shrink, surrogate_variable
-  #)
-
-  #edgeRCode
+  # edgeRCode
   print("Running edgeR")
-  find_de_edger(old_dge,
-                group, batch_design, keyfile,
-                project_paths, analysis,
-                surrogate_variable, padj)
+  find_de_edger(
+    old_dge,
+    group, batch_design, keyfile,
+    project_paths, analysis,
+    surrogate_variable, padj
+  )
+
+  # DESEQ2Code
+  print("Running DESeq2")
+  find_de_deseq(
+    dge_deseq,
+    keyfile, group, batch_design,
+    padj, project_paths, fc_shrink, surrogate_variable
+  )
+
+
 
 
 
