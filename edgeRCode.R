@@ -7,6 +7,7 @@ find_de_edger <- function(old_dge,
                           surrogate_variable,
                           padj) {
 
+  print("Calculating normalisation factors")
   dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
 
 
@@ -24,6 +25,7 @@ find_de_edger <- function(old_dge,
   ))
 
   if (surrogate_variable) {
+    print("Running SV analysis")
     dat    <- cpm(dge)
     mod    <- eval(parse(text = paste0(
       "model.matrix(~ ",
@@ -36,6 +38,7 @@ find_de_edger <- function(old_dge,
     design <- cbind(design, svseq$sv)
   }
 
+  print("Running limma and voom")
   v   <- edgeR::voomLmFit(dge,
                           design,
                           plot = TRUE, sample.weights = surrogate_variable)
