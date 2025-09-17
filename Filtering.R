@@ -144,7 +144,7 @@ read_data <- function(keyfile, group, paths) {
   return(dge)
 }
 
-filter.wrapper <-  function(keyfile,
+filter_wrapper <-  function(keyfile,
                             group,
                             paths,
                             annotation,
