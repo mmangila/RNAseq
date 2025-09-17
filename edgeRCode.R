@@ -223,9 +223,12 @@ de_edger_tables <- function(keyfile,
   fit2 <- limma::contrasts.fit(fit, contrast_matrix)
   fit2 <- limma::eBayes(fit2)
 
+  print("Find differentially expressed genes")
+
   results            <- limma::decideTests(fit2)
   results_2fc        <- limma::decideTests(fit2, lfc = log2(2))
   results_1point5_fc <- limma::decideTests(fit2, lfc = log2(1.5))
+
 
   print("Differentially expressed genes")
   print(summary(results))
@@ -233,6 +236,8 @@ de_edger_tables <- function(keyfile,
   print(summary(results_1point5_fc))
   print("Differentially expressed genes with >2 fold change")
   print(summary(results_2fc))
+
+  print("Make tables")
 
   de_table_all <- limma::topTable(fit = fit2, number = Inf)
   de_table_2fc <- limma::topTable(fit = fit2, number = Inf, lfc = 1)
@@ -267,9 +272,7 @@ de_edger_tables <- function(keyfile,
       dev.off()
     }
 
-    results            <- decideTests(fit2)
-    results_2fc        <- decideTests(fit2, lfc = log2(2))
-    results_1point5_fc <- decideTests(fit2, lfc = log2(1.5))
+    print("Make smear plots")
 
     pdf(paste0(test_base_dir, test_name, "_smear.pdf"))
     MAplotGeneSetLimma(
@@ -317,6 +320,8 @@ de_edger_tables <- function(keyfile,
     write.csv(tt, paste0(test_base_dir, test_name, "_detags_2FC.csv"))
   }
 
+  print("Create fold change and fdr tables")
+  
   tests <- mclapply(coefs,
                     function(x) {
                       topTable(fit     = fit2,
@@ -352,7 +357,6 @@ de_edger_tables <- function(keyfile,
                                   })
   names(tests_sig_1point5fc) <- coefs
 
-  cpm_matrix <- cpm(v)
   write.csv(fdr_matrix, file = paste0(out_base, analysis, "_fdr.csv"))
 }
 
