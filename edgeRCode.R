@@ -13,7 +13,7 @@ find_de_edger <- function(old_dge,
   print(batch_design)
   design <- eval(parse(text = paste0(
     "model.matrix(~ 0 + ",
-    group, batch_design,
+    batch_design,
     ", data = keyfile)"
   )))
   colnames(design)[seq_along(keyfile)] <- eval(parse(
@@ -29,7 +29,7 @@ find_de_edger <- function(old_dge,
     dat    <- cpm(dge)
     mod    <- eval(parse(text = paste0(
       "model.matrix(~ ",
-      group,
+      batch_design,
       ", data = keyfile)"
     )))
     mod0   <- model.matrix(~ 1, data = keyfile)

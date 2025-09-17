@@ -134,7 +134,7 @@ analyse_rnaseq <-  function(project_folder,
                               func_path, func_focus)
   dge_deseq <- read_data(keyfile, group, project_paths)
 
-  batch_design <- paste(c("", batch), collapse = " + ")
+  batch_design <- paste(c(group, batch), collapse = " + ")
 
   # DESEQ2Code
   #print("Running DESeq2")
