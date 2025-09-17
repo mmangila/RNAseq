@@ -39,9 +39,21 @@ find_de_deseq <- function(dge_deseq,
 
     svseq <- sva::svaseq(dat, mod, mod0)
     ddssva <- dds
+
+    sapply(seq_along(svseq[1, ]), function(sv) {
+      eval(parse(text = paste0(
+        "ddsva$SV",
+        sv,
+        " <- svseq$sv[, ]",
+        sv
+      )))
+    })
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
-    design(ddssva) <- eval(parse(text = paste("~ SV1 + SV2 +", group)))
+    design(ddssva) <- eval(parse(text = paste("~",
+                                              paste0("SV", svseq$sv[1, ],
+                                                     collapse = " + "),
+                                              "+", group)))
     dds <- ddssva
   }
 

@@ -40,7 +40,7 @@ find_de_edger <- function(old_dge,
     mod0   <- model.matrix(~ 1, data = keyfile)
     svseq  <- sva::svaseq(dat, mod, mod0)
     print("SVseq finished")
-    colnames(svseq$sv) <- c("SV1", "SV2")
+    colnames(svseq$sv) <- paste0("SV", seq_along(svseq$sv[1, ]))
     design <- cbind(design, svseq$sv)
   }
 
