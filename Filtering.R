@@ -54,9 +54,10 @@ install_libraries <- function(libraries, installer) {
     library(x, character.only = TRUE)
   })
 }
-assignment_summary <- function(paths,keyfile) {
+assignment_summary <- function(paths, keyfile) {
 
-  files       <- dir(
+  print("Reading in files")
+  files <- dir(
     paste0(paths[2], "/"),
     pattern = "*.counts.summary"
   )
@@ -68,6 +69,8 @@ assignment_summary <- function(paths,keyfile) {
       function(fn) data.frame(read.delim(fn, row.names = 1))
     )
   )
+
+  print("Creating mapping plots")
 
   fcs            <- data.frame(t(fcs))
   row.names(fcs) <- as.data.frame(keyfile)[, 1]
@@ -85,6 +88,8 @@ assignment_summary <- function(paths,keyfile) {
       viridis_pal(option = "C")(n = length(keyfile[, 1])))
   )
 
+  print("Proportional mapped plot")
+
   pdf(paste0(paths[5], "/percent_mapped_plot.pdf"), w = 8, h = 4)
   print(
     ggplot(plot_data, aes(x = Var1, y = rev(value), fill = rev(Var2))) +
@@ -99,6 +104,8 @@ assignment_summary <- function(paths,keyfile) {
   dev.off()
 
   ###Assigned reads as total read number
+
+  print("Total mapped plot")
 
   pdf(paste0(paths[5], "/total_mapped_plot.pdf"), w = 6, h = 4)
   plot_data <- fcs_plot
