@@ -37,7 +37,9 @@ find_de_deseq <- function(dge_deseq,
     )))
     mod0 <- model.matrix(~ 1, colData(dds))
 
-    svseq <- sva::svaseq(dat, mod, mod0)
+    svs <- sva::num.sv(dat, mod, method = "leek")
+
+    svseq <- sva::svaseq(dat, mod, mod0, n.sv = svs - 1)
     ddssva <- dds
 
     sapply(seq_along(svseq[1, ]), function(sv) {
@@ -51,7 +53,7 @@ find_de_deseq <- function(dge_deseq,
     ddssva$SV1 <- svseq$sv[, 1]
     ddssva$SV2 <- svseq$sv[, 2]
     design(ddssva) <- eval(parse(text = paste("~",
-                                              paste0("SV", svseq$sv[1, ],
+                                              paste0("SV", 1:(svs - 1),
                                                      collapse = " + "),
                                               "+", group)))
     dds <- ddssva
