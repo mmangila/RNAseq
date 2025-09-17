@@ -42,6 +42,7 @@ lfc_suffixes <- data.frame(
 analyse_rnaseq <-  function(project_folder,
                             analysis,
                             group,
+                            batch = vector(mode = "character"),
                             padj,
                             mapman_focus,
                             annotation = FALSE, go = FALSE, fc_shrink = FALSE,
@@ -87,8 +88,8 @@ analyse_rnaseq <-  function(project_folder,
     "https://github.com/mmangila/RNAseq/raw/main/CombinedCode.R",
     "https://github.com/mmangila/RNAseq/raw/main/DESEQ2Code.R",
     "https://github.com/mmangila/RNAseq/raw/main/edgeRCode.R",
-    "https://github.com/mmangila/RNAseq/raw/main/rewrittenHonoursCode.R",
-    "https://github.com/pedrocrisp/NGS-pipelines/raw/master/R_functions/MAplotGeneSetLimma.R"
+    "https://github.com/mmangila/RNAseq/raw/main/Filtering.R",
+    "https://github.com/mmangila/RNAseq/raw/main/MAplotGeneSetLimma.R"
   )
 
   sapply(urls, devtools::source_url)
@@ -97,7 +98,7 @@ analyse_rnaseq <-  function(project_folder,
   install_libraries(base_libs,         install.packages)
 
   project_paths <- file_paths(project_folder, analysis)
-  keyfile       <- create.folders(project_paths)
+  keyfile       <- create_folders(project_paths)
   keyfile[sapply(keyfile, is.character)] <- lapply(
     keyfile[sapply(keyfile, is.character)],
     as.factor
@@ -109,34 +110,45 @@ analyse_rnaseq <-  function(project_folder,
   colnames(keyfile)[1] <- "Sample_ID"
 
   if (annotation) {
-    func_path <- readline(
-      "Enter the location of the genome functional annotation here (Valid format: .csv): "
-    )
-    func_focus <- readline(
-      "Which column of the functional annotation is reflected in the featureCounts results? "
-    )
+    func_path <- readline(paste(
+      "Enter the location of the genome functional annotation here",
+      "(Valid format: .csv): "
+    ))
+    func_focus <- readline(paste(
+      "Which column of the functional annotation",
+      "is reflected in the featureCounts results? "
+    ))
   } else {
     func_path <- "None"
     func_focus <- "X"
   }
 
   print("Begin analysis")
-  assignment.summary(project_paths, keyfile)
+  assignment_summary(project_paths, keyfile)
 
   print("Filter data")
-  old_dge   <- filter.wrapper(keyfile, group, project_paths, annotation, func_path, func_focus)
-  dge_deseq <- read.data(keyfile, group, project_paths)
+  old_dge   <- filter_wrapper(keyfile,
+                              group,
+                              project_paths,
+                              annotation,
+                              func_path, func_focus)
+  dge_deseq <- read_data(keyfile, group, project_paths)
+
+  batch_design <- paste(c("", batch), collapse = " + ")
 
   # DESEQ2Code
-  print("Running DESeq2")
-  find_de_deseq(
-    dge_deseq, keyfile, group,
-    padj, project_paths, fc_shrink, surrogate_variable
-  )
+  #print("Running DESeq2")
+  #find_de_deseq(
+  #  dge_deseq,
+  #  keyfile, group, batch_design,
+  #  padj, project_paths, fc_shrink, surrogate_variable
+  #)
 
   #edgeRCode
   print("Running edgeR")
-  find_de_edger(old_dge, group, keyfile, project_paths, analysis,
+  find_de_edger(old_dge,
+                group, batch_design, keyfile,
+                project_paths, analysis,
                 surrogate_variable, padj)
 
 

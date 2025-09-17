@@ -1,5 +1,6 @@
 find_de_edger <- function(old_dge,
                           group,
+                          batch_design,
                           keyfile,
                           paths,
                           analysis,
@@ -11,10 +12,10 @@ find_de_edger <- function(old_dge,
 
   design <- eval(parse(text = paste0(
     "model.matrix(~ 0 + ",
-    group,
+    group, batch_design,
     ", data = keyfile)"
   )))
-  colnames(design) <- eval(parse(
+  colnames(design)[seq_along(keyfile)] <- eval(parse(
     text = paste0(
       "levels(as.factor(keyfile$",
       group,
@@ -191,24 +192,24 @@ de_edger_tables <- function(keyfile,
     )
   })
 
-  if (length(inside2) > 1) { 
-  contrast_matrix <- eval(
-    parse(
-      text = paste0("makeContrasts(",
-                    paste(inside2, collapse = ","),
-                    ", levels = design)")
-    )
-  )
-  } else if (length(inside2) == 1) {
-  contrast_matrix <- eval(
-    parse(
-      text = paste0(
-        "makeContrasts(",
-        inside2,
-        ", levels = design)"
+  if (length(inside2) > 1) {
+    contrast_matrix <- eval(
+      parse(
+        text = paste0("makeContrasts(",
+                      paste(inside2, collapse = ","),
+                      ", levels = design)")
       )
     )
-  )
+  } else if (length(inside2) == 1) {
+    contrast_matrix <- eval(
+      parse(
+        text = paste0(
+          "makeContrasts(",
+          inside2,
+          ", levels = design)"
+        )
+      )
+    )
   }
 
   fit2 <- limma::contrasts.fit(fit, contrast_matrix)
