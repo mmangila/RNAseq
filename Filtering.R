@@ -74,7 +74,7 @@ assignment_summary <- function(paths,keyfile) {
   fcs_t          <- t(fcs)
   fcs_plot       <- melt(fcs_t)
 
-  prop           <- prop_table(fcs_t, margin = 2)
+  prop           <- prop.table(fcs_t, margin = 2)
   prop_t         <- t(prop)
   prop_plot      <- melt(prop_t)
 
