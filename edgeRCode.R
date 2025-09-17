@@ -11,13 +11,14 @@ find_de_edger <- function(old_dge,
   dge <- edgeR::calcNormFactors(old_dge, method = "TMM")
 
   print(batch_design)
+
   design <- eval(parse(text = paste0(
     "model.matrix(~ 0 + ",
     batch_design,
     ", data = keyfile)"
   )))
 
-  group_levels <- eval(parse(text = paste0("levels(keyfile$)", group)))
+  group_levels <- eval(parse(text = paste0("levels(keyfile$", group)))
   print(group_levels)
 
   colnames(design)[seq_along(group_levels)] <- eval(parse(
