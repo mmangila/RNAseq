@@ -16,8 +16,8 @@ find_de_deseq <- function(dge_deseq,
     "DESeqDataSetFromMatrix(",
     "countData = dge_deseq$counts,",
     "colData = keyfile,",
-    "design= ~ ",
-    group, ")"
+    "design= ~ 1 + ",
+    batch_design, ")"
   )))
 
   dds <- estimateSizeFactors(dds)
@@ -25,8 +25,8 @@ find_de_deseq <- function(dge_deseq,
   if (surrogate_variable) {
     dat <- counts(dds, normalized = TRUE)
     mod <- eval(parse(text = paste0(
-      "model.matrix(~ ",
-      group,
+      "model.matrix(~ 1 + ",
+      batch_design,
       ", colData(dds))"
     )))
     mod0 <- model.matrix(~ 1, colData(dds))
