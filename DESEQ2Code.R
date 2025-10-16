@@ -112,11 +112,15 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
   print(lfc_suffixes)
 
   sapply(seq_along(combos[1, ]), function(x) {
+
     test_name <- paste0(
       combos[1, x],
       ".vs.",
       combos[2, x]
     )
+
+    print(paste0("Begin ", test_name))
+
     test_base_dir <- paste0(out_base,
                             test_name,
                             "/")
