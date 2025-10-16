@@ -165,6 +165,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                               test_name,
                               lfc_suffixes$Suffix[lvl]))
     })
+    print(paste("Finished", test_name))
   })
 }
 
