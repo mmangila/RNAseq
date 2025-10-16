@@ -91,7 +91,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
   combos <- eval(
     parse(
       text = paste0(
-        "perm(as.data.frame(keyfile %>% distinct(",
+        "perm(as.data.frame(keyfile %>% distinct(as.character(",
         group,
         "))[,1])"
       )

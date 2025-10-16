@@ -178,9 +178,9 @@ de_edger_tables <- function(keyfile,
   combos <- eval(
     parse(
       text = paste0(
-        "perm(as.data.frame(keyfile %>% distinct(",
+        "perm(as.data.frame(keyfile %>% distinct(as.character(",
         group,
-        "))[,1])"
+        ")))[,1])"
       )
     )
   )
