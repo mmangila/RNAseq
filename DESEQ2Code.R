@@ -40,7 +40,7 @@ find_de_deseq <- function(dge_deseq,
     svs <- sva::num.sv(dat, mod, method = "leek")
     svseq <- run_svaseq(dat, mod, mod0, svs)
 
-    if(svs == 0) {
+    if(svseq == 0) {
       find_de_deseq(dge_deseq,
                     keyfile,
                     group,
