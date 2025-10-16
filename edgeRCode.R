@@ -178,7 +178,7 @@ de_edger_tables <- function(keyfile,
   combos <- eval(
     parse(
       text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(",
+        "expand.grid(as.data.frame(keyfile %>% distinct(",
         group,
         "))[,1],2)"
       )

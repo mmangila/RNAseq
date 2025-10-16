@@ -137,11 +137,6 @@ analyse_rnaseq <-  function(project_folder,
     keyfile, group, batch_design,
     padj, project_paths, fc_shrink, surrogate_variable
   )
-
-
-
-
-
   # Find the union
   print("Combining the analyses")
   find_combined_de(keyfile,
