@@ -141,7 +141,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
               file = paste0(test_base_dir,
                             test_name,
                             "_alltags.csv"))
-
+    print("Creating volcano plot")
     pdf(paste0(test_base_dir,test_name,"_volcano.pdf"), width = 5, height = 3.5)
     print(EnhancedVolcano(de_genes,
                           lab = rownames(de_genes),
@@ -150,15 +150,16 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
     dev.off()
 
     sapply(seq_along(lfc_suffixes$Level), function(x) {
+      print(print("Get significantly DE genes above", lfc_suffixes$Level[x], "FC"))
       de_genes_sigs <- filter_de_set(
         de_genes,
-        lfc_suffixes[x, 1],
+        lfc_suffixes$Level[x],
         padj
       )
       write_csv(as.data.frame(de_genes_sigs),
                 file = paste0(test_base_dir,
                               test_name,
-                              lfc_suffixes[x, 2]))
+                              lfc_suffixes$Suffix[x]))
     })
   })
 }
