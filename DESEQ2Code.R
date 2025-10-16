@@ -44,6 +44,7 @@ find_de_deseq <- function(dge_deseq,
     svseq <- run_svaseq(dat, mod, mod0, svs)
 
     if(svseq == 0) {
+      print("Run again without SVAseq")
       find_de_deseq(dge_deseq,
                     keyfile,
                     group,
