@@ -194,6 +194,6 @@ filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
 }
 
 run_svaseq <- function (dat, mod, mod0, svs) {
-  t <- try(sva::svseq(dat, mod, mod0, n.sv = svs))
+  t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
   if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
 }
