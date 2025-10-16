@@ -153,17 +153,17 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
 
     print("Write significantly DE genes to tables")
 
-    sapply(seq_along(lfc_suffixes$Level), function(x) {
-      print(paste("Get significantly DE genes above", lfc_suffixes$Level[x], "FC"))
+    sapply(seq_along(lfc_suffixes$Level), function(lvl) {
+      print(paste("Get significantly DE genes above", lfc_suffixes$Level[lvl], "FC"))
       de_genes_sigs <- filter_de_set(
         de_genes,
-        lfc_suffixes$Level[x],
+        lfc_suffixes$Level[lvl],
         padj
       )
       write_csv(as.data.frame(de_genes_sigs),
                 file = paste0(test_base_dir,
                               test_name,
-                              lfc_suffixes$Suffix[x]))
+                              lfc_suffixes$Suffix[lvl]))
     })
   })
 }
