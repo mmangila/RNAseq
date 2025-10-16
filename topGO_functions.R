@@ -186,7 +186,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
 
   sapply(1:length(combos[1, ]), function (x) {
     sapply(1:length(go_opts[, 1]), function (y) {
-      analyse_topGo(as.character(go_opts[y, 1]),
+      analyse_topgo(as.character(go_opts[y, 1]),
                     as.character(go_opts[y, 2]),
                     paste0(combos[1,x], ".vs.", combos[2,x]),
                     paste0(project_paths[3],
@@ -201,7 +201,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
     })
     # map2(
     #   rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-    #   analyse_topGo,
+    #   analyse_topgo,
     #   test_name     = paste0(combos[1,x], ".vs.", combos[2,x]),
     #   de_table_file = paste0(project_paths[3],
     #                          "/Combined/DE_tables/",
@@ -238,7 +238,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
   sapply(1:combos[1, ], function (x) {
     map2(
       rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-      analyse_topGo,
+      analyse_topgo,
       test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
       big_data   = big_data,
       data_folder = data_folder
