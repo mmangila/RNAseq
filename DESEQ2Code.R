@@ -38,6 +38,16 @@ find_de_deseq <- function(dge_deseq,
     mod0 <- model.matrix(~ 1, colData(dds))
 
     svs <- sva::num.sv(dat, mod, method = "leek")
+    if(svs == 0) {
+      find_de_deseq(dge_deseq,
+                    keyfile,
+                    group,
+                    batch_design,
+                    padj,
+                    paths,
+                    fc_shrink,
+                    surrogate_variable == FALSE)
+    }
 
     svseq <- run_svaseq(dat, mod, mod0, svs)
     ddssva <- dds
@@ -194,6 +204,16 @@ filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
 }
 
 run_svaseq <- function (dat, mod, mod0, svs) {
+  if(svs == 0) {
+    find_de_deseq(dge_deseq,
+                  keyfile,
+                  group,
+                  batch_design,
+                  padj,
+                  paths,
+                  fc_shrink,
+                  surrogate_variable == FALSE)
+  }
   t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
   if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
 }
