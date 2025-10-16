@@ -20,9 +20,12 @@ find_de_deseq <- function(dge_deseq,
     batch_design, ")"
   )))
 
+  print("Estimating size factors")
+
   dds <- estimateSizeFactors(dds)
 
   if (surrogate_variable) {
+    print("Running SVAseq")
     print(paste0(
       "model.matrix(~ 1 + ",
       batch_design,
@@ -68,6 +71,8 @@ find_de_deseq <- function(dge_deseq,
                                               "+", group)))
     dds <- ddssva
   }
+
+  print("Run DESeq2")
 
   dds <- DESeq2::DESeq(dds)
 
