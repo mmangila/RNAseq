@@ -46,7 +46,7 @@ find_de_deseq <- function(dge_deseq,
                     padj,
                     paths,
                     fc_shrink,
-                    surrogate_variable == FALSE)
+                    surrogate_variable = FALSE)
     }
 
     svseq <- run_svaseq(dat, mod, mod0, svs)
@@ -212,7 +212,7 @@ run_svaseq <- function (dat, mod, mod0, svs) {
                   padj,
                   paths,
                   fc_shrink,
-                  surrogate_variable == FALSE)
+                  surrogate_variable = FALSE)
   }
   t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
   if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
