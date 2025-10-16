@@ -149,7 +149,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                           y = "pvalue"))
     dev.off()
 
-    sapply(1:3, function(x) {
+    sapply(seq_along(lfc_suffixes$Level), function(x) {
       de_genes_sigs <- filter_de_set(
         de_genes,
         lfc_suffixes[x, 1],
