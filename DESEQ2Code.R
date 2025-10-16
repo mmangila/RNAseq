@@ -39,7 +39,7 @@ find_de_deseq <- function(dge_deseq,
 
     svs <- sva::num.sv(dat, mod, method = "leek")
 
-    svseq <- sva::svaseq(dat, mod, mod0)
+    svseq <- run_svaseq(dat, mod, mod0, svs)
     ddssva <- dds
 
     sapply(seq_along(svseq[1, ]), function(sv) {
@@ -191,4 +191,9 @@ filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
   ]
 
   return(filtered_de_set)
+}
+
+run_svaseq <- function (dat, mod, mod0, svs) {
+  t <- try(sva::svseq(dat, mod, mod0, n.sv = svs))
+  if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
 }
