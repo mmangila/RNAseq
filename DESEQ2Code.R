@@ -216,6 +216,6 @@ run_svaseq <- function (dat, mod, mod0, svs) {
   } else {
     t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
   }
-  if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
+  if("try-error" %in% class(t)) t <- run_svaseq(dat, mod, mod0, svs - 1)
   return(t)
 }
