@@ -151,6 +151,8 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                           y = "pvalue"))
     dev.off()
 
+    print("Write significantly DE genes to tables")
+
     sapply(seq_along(lfc_suffixes$Level), function(x) {
       print(print("Get significantly DE genes above", lfc_suffixes$Level[x], "FC"))
       de_genes_sigs <- filter_de_set(
