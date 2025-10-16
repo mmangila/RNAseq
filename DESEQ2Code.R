@@ -109,6 +109,8 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                "_detags_2FC.csv")
   )
 
+  print(lfc_suffixes)
+
   sapply(seq_along(combos[1, ]), function(x) {
     test_name <- paste0(
       combos[1, x],
