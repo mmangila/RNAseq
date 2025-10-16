@@ -106,8 +106,8 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
     de_genes  <- results(
       dds,
       contrast = c(group,
-                   as.character(combos[2, x]),
-                   as.character(combos[1, x])),
+                   as.character(combos[1, x]),
+                   as.character(combos[2, x])),
       alpha = 0.99999
     )
 
