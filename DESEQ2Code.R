@@ -39,7 +39,7 @@ find_de_deseq <- function(dge_deseq,
 
     svs <- sva::num.sv(dat, mod, method = "leek")
 
-    svseq <- sva::svaseq(dat, mod, mod0, n.sv = svs - 1)
+    svseq <- sva::svaseq(dat, mod, mod0)
     ddssva <- dds
 
     sapply(seq_along(svseq[1, ]), function(sv) {
