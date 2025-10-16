@@ -91,9 +91,9 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
   combos <- eval(
     parse(
       text = paste0(
-        "expand.grid(as.data.frame(keyfile %>% distinct(",
+        "perm(as.data.frame(keyfile %>% distinct(",
         group,
-        "))[,1],2)"
+        "))[,1])"
       )
     )
   )
@@ -224,4 +224,14 @@ run_svaseq <- function (dat, mod, mod0, svs) {
   }
   if("try-error" %in% class(t)) t <- run_svaseq(dat, mod, mod0, svs - 1)
   return(t)
+}
+
+perm <- function(v) {
+  n <- length(v)
+  if (n == 1) v
+  else {
+    X <- NULL
+    for (i in 1:n) X <- rbind(X, cbind(v[i], perm(v[-i])))
+    X
+  }
 }

@@ -178,9 +178,9 @@ de_edger_tables <- function(keyfile,
   combos <- eval(
     parse(
       text = paste0(
-        "expand.grid(as.data.frame(keyfile %>% distinct(",
+        "perm(as.data.frame(keyfile %>% distinct(",
         group,
-        "))[,1],2)"
+        "))[,1])"
       )
     )
   )
@@ -799,4 +799,15 @@ make_PCA_plots_large_labels <- function (dot_colour,
     ) +
     coord_equal()
   print(g)
+}
+
+
+perm <- function(v) {
+  n <- length(v)
+  if (n == 1) v
+  else {
+    X <- NULL
+    for (i in 1:n) X <- rbind(X, cbind(v[i], perm(v[-i])))
+    X
+  }
 }
