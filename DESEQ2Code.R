@@ -93,7 +93,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
       text = paste0(
         "perm(as.data.frame(keyfile %>% distinct(as.character(",
         group,
-        "))[,1])"
+        ")))[,1])"
       )
     )
   )
