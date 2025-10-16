@@ -99,16 +99,16 @@ analyse_topgo <- function(ontology_to_test,
 
   pdf(node_path)
   par(cex = 0.5)
-  showSigOfNodes(go_data,
+  try(showSigOfNodes(go_data,
                  score(result_ks_elim),
                  firstSigNodes = 5,
-                 useInfo       = "all")
-  printGraph(go_data,
+                 useInfo       = "all"))
+  try(printGraph(go_data,
              result_fisher,
              firstSigNodes = 5,
              fn.prefix     = "tGO",
              useInfo       = "all",
-             pdfSW         = TRUE)
+             pdfSW         = TRUE))
   dev.off()
 
 }
@@ -184,8 +184,8 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
 
   go_opts <- expand.grid(c("BP", "MF", "CC"), c("up", "down"))
 
-  sapply(1:length(combos[1, ]), function (x) {
-    sapply(1:length(go_opts[, 1]), function (y) {
+  sapply(seq_along(combos[1, ]), function (x) {
+    sapply(seq_along(go_opts[, 1]), function (y) {
       analyse_topgo(as.character(go_opts[y, 1]),
                     as.character(go_opts[y, 2]),
                     paste0(combos[1,x], ".vs.", combos[2,x]),

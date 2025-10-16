@@ -209,9 +209,9 @@ find_combined_de <-  function(keyfile,
   combos <- eval(
     parse(
       text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(",
+        "perm(as.data.frame(keyfile %>% distinct(",
         group,
-        "))[,1],2)"
+        "))[,1])"
       )
     )
   )
