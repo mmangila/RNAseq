@@ -50,8 +50,7 @@ find_de_deseq <- function(dge_deseq,
         sv
       )))
     })
-    ddssva$SV1 <- svseq$sv[, 1]
-    ddssva$SV2 <- svseq$sv[, 2]
+
     design(ddssva) <- eval(parse(text = paste("~",
                                               paste0("SV", 1:(svs - 1),
                                                      collapse = " + "),
@@ -114,8 +113,8 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
     if (fc_shrink == TRUE) {
       de_genes <- lfc_shrink(dds,
                              contrast = c(group,
-                                          as.character(combos[2, x]),
-                                          as.character(combos[1, x])),
+                                          as.character(combos[1, x]),
+                                          as.character(combos[2, x])),
                              res      = de_genes,
                              type     = "ashr")
     }
