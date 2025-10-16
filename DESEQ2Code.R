@@ -211,9 +211,11 @@ filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
 }
 
 run_svaseq <- function (dat, mod, mod0, svs) {
-  if(svs == 0) t <- 0
-  else t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
-  
+  if(svs == 0) {
+    t <- 0
+  } else {
+    t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
+  }
   if("try-error" %in% class(t)) run_svaseq(dat, mod, mod0, svs - 1)
   return(t)
 }
