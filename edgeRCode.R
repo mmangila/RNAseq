@@ -185,6 +185,8 @@ de_edger_tables <- function(keyfile,
     )
   )
 
+  print(combos)
+
   inside <- vector(mode = "character")
   inside2 <- sapply(seq_along(combos[1, ]), function(x) {
     inside <- c(
