@@ -46,11 +46,13 @@ file_paths <- function(project_folder, analysis) {
 
 ## Summary of reads assigned to features by featureCounts (after mapping)
 
-install_libraries <- function(libraries, installer) {
+install_libraries <- function(libraries, installer, mirror) {
   if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
   lapply(libraries, function(x) {
-    if (!require(x, character.only = TRUE)) do.call(installer, list(x))
+    arguments <- list(x, mirror)
+    names(arguments) <- c("pkgs", "repos")
+    if (!require(x, character.only = TRUE)) do.call(installer, arguments)
     library(x, character.only = TRUE)
   })
 }
