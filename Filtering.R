@@ -50,8 +50,8 @@ install_libraries <- function(libraries, installer, mirror) {
   if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
   lapply(libraries, function(x) {
-    arguments <- list(x, mirror)
-    names(arguments) <- c("pkgs", "repos")
+    arguments <- list(x, mirror, TRUE)
+    names(arguments) <- c("pkgs", "repos", "dependencies")
     if (!require(x, character.only = TRUE)) do.call(installer, arguments)
     library(x, character.only = TRUE)
   })
