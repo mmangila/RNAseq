@@ -13,7 +13,7 @@ find_de_combined <-  function(combos,
                               func_focus,
                               paths) {
 
-  de_genes_summary <- t(combos)
+  de_genes_summary <- combos
   rownames(de_genes_summary) <- paste(
     de_genes_summary[,1],
     "vs",
@@ -209,9 +209,9 @@ find_combined_de <-  function(keyfile,
   combos <- eval(
     parse(
       text = paste0(
-        "perm(as.data.frame(keyfile %>% distinct(",
+        "combn(as.data.frame(keyfile %>% distinct(",
         group,
-        "))[,1])"
+        "))[,1], 2)"
       )
     )
   )
