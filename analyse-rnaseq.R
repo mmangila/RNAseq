@@ -79,8 +79,8 @@ analyse_rnaseq <-  function(project_folder,
 
   sapply(urls, devtools::source_url)
 
-  install_libraries(bioconductor_libs, BiocManager::install)
-  install_libraries(base_libs,         install.packages)
+  install_libraries(bioconductor_libs, BiocManager::install, "https://cran.csiro.au/")
+  install_libraries(base_libs,         install.packages,     "https://cran.csiro.au/")
 
   project_paths <- file_paths(project_folder, analysis)
   keyfile       <- create_folders(project_paths)
