@@ -16,7 +16,7 @@ find_de_deseq <- function(dge_deseq,
     "DESeqDataSetFromMatrix(",
     "countData = dge_deseq$counts,",
     "colData   = keyfile,",
-    "design    = ~ 1 + ",
+    "design    = ~ ",
     batch_design, ")"
   )))
 
