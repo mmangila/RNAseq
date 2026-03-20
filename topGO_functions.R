@@ -17,6 +17,7 @@ analyse_topgo <- function(ontology_to_test,
   # #####
 
   dir.create(out_dir, showWarnings = FALSE)
+  dir.create(paste0(out_dir, "/genes-in-gos/", ontology_to_test), showWarnings = FALSE, recursive = TRUE)
   de_table <- read_csv(de_table_file)
   gene_universe <- de_table %>% pull(func_focus)
 
@@ -73,6 +74,18 @@ analyse_topgo <- function(ontology_to_test,
            Aspect = ontology_to_test)
 
   sig_res_fdr   <- all_res_fdr %>% filter(fdr < 0.05)
+
+  sapply(sig_res_fdr$GO.ID, function(go_term) {
+    go_genes     <- genesInTerm(go_data, go_term)
+    dmr_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
+    print(paste0("Getting genes for ", go_term))
+
+    go_table <- anno_table_with_grandis[anno_table_with_grandis$Locus %in% dmr_go_genes, ]
+      write.csv(go_table,
+                paste0(out_dir, "/genes-in-gos/", ontology_to_test,
+                       "/Surrounding.vs.Ungalled_", de_direction,
+                       "_", go_term, "_genes.csv"))
+  })
 
   write_csv(sig_res_fdr,
             paste0(out_dir,
