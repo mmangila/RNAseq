@@ -243,7 +243,7 @@ find_combined_de <-  function(keyfile,
       "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
     )
 
-    analyse_go(funcs, func_focus, project_folder, combos, paths)
+    analyse_go(funcs, func_focus, project_folder, combos, paths, annotation)
   }
 }
 
