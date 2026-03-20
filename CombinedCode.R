@@ -181,7 +181,7 @@ find_de_combined <-  function(combos,
 
   })
 
-  return(final_table
+  return(final_table)
 }
 
 
