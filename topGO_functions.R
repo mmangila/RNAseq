@@ -4,7 +4,8 @@ analyse_topgo <- function(ontology_to_test,
                           de_table_file,
                           out_dir,
                           func_focus,
-                          geneid_to_go) {
+                          geneid_to_go,
+                          annotation) {
 
   ### args
   # ontology_to_test = "BP"
@@ -76,15 +77,20 @@ analyse_topgo <- function(ontology_to_test,
   sig_res_fdr   <- all_res_fdr %>% filter(fdr < 0.05)
 
   sapply(sig_res_fdr$GO.ID, function(go_term) {
-    go_genes     <- genesInTerm(go_data, go_term)
-    dmr_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
+    go_genes    <- genesInTerm(go_data, go_term)
+    de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
     print(paste0("Getting genes for ", go_term))
 
-    go_table <- anno_table_with_grandis[anno_table_with_grandis$Locus %in% dmr_go_genes, ]
-      write.csv(go_table,
-                paste0(out_dir, "/genes-in-gos/", ontology_to_test,
-                       "/Surrounding.vs.Ungalled_", de_direction,
-                       "_", go_term, "_genes.csv"))
+    if (annotation != NULL) {
+      go_table <- annotation[annotation[, 1] %in% de_go_genes, ]
+    } else {
+      go_table <- de_go_genes
+    }
+    
+    write.csv(go_table,
+              paste0(out_dir, "/genes-in-gos/", ontology_to_test,
+                     "/Surrounding.vs.Ungalled_", de_direction,
+                     "_", go_term, "_genes.csv"))
   })
 
   write_csv(sig_res_fdr,
@@ -179,7 +185,7 @@ go_plot_comparison <- function(ontology_to_test,
   dev.off()
 }
 
-analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths) {
+analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths, annotation) {
 
   geneDescription_GO <- funcs %>%
     dplyr::select(func_focus, GO) %>%
@@ -210,7 +216,8 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                            "_detags_1point5FC.csv"),
                     paste0(project_paths[3], "/Combined/GO_tests/"),
                     func_focus,
-                    geneid_to_go)
+                    geneid_to_go,
+                    annotation)
     })
     # map2(
     #   rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
@@ -251,7 +258,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
   sapply(1:combos[1, ], function (x) {
     map2(
       rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-      analyse_topgo,
+      go_plot_comparison,
       test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
       big_data   = big_data,
       data_folder = data_folder
