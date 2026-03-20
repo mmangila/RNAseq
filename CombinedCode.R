@@ -180,6 +180,8 @@ find_de_combined <-  function(combos,
                     "_alltags.csv"))
 
   })
+
+  return(final_table
 }
 
 
@@ -227,13 +229,13 @@ find_combined_de <-  function(keyfile,
   }
 
   sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
-  find_de_combined(combos,
-                   lfc_suffixes,
-                   combined_folder,
-                   annotation,
-                   funcs,
-                   func_focus,
-                   paths)
+  final_table <- find_de_combined(combos,
+                                  lfc_suffixes,
+                                  combined_folder,
+                                  annotation,
+                                  funcs,
+                                  func_focus,
+                                  paths)
   sink()
 
   print("Begin GO analysis")
@@ -243,7 +245,7 @@ find_combined_de <-  function(keyfile,
       "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
     )
 
-    analyse_go(funcs, func_focus, project_folder, combos, paths, annotation)
+    analyse_go(funcs, func_focus, project_folder, combos, paths, final_table)
   }
 }
 
