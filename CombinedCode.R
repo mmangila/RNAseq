@@ -13,7 +13,7 @@ find_de_combined <-  function(combos,
                               func_focus,
                               paths) {
 
-  de_genes_summary <- combos
+  de_genes_summary <- t(combos)
   rownames(de_genes_summary) <- paste(
     de_genes_summary[,1],
     "vs",
