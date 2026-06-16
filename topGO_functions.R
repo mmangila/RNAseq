@@ -3,6 +3,7 @@ analyse_topgo <- function(ontology_to_test,
                           test_name,
                           de_table_file,
                           out_dir,
+                          funcs,
                           func_focus,
                           geneid_to_go,
                           annotation,
@@ -84,7 +85,7 @@ analyse_topgo <- function(ontology_to_test,
     print(paste0("Getting genes for ", go_term))
 
     if (annotation) {
-      go_table <- annotation[annotation[, 1] %in% de_go_genes, ]
+      go_table <- funcs[funcs[, 1] %in% de_go_genes, ]
     } else {
       go_table <- de_go_genes
     }
@@ -220,6 +221,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                     func_focus,
                     geneid_to_go,
                     annotation,
+                    funcs,
                     de_logfc,
                     go_pval)
     })
