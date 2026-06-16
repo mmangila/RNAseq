@@ -8,25 +8,19 @@ lfc_suffixes <- data.frame(
 find_de_combined <-  function(combos,
                               lfc_suffixes,
                               combined_folder,
+                              comp_num,
                               annotation,
                               funcs,
                               func_focus,
                               paths) {
 
-  de_genes_summary <- t(combos)
-  rownames(de_genes_summary) <- paste(
-    de_genes_summary[,1],
+  de_genes_summary <- combos[, comp_num]
+  test_name <- paste(
+    de_genes_summary[1],
     "vs",
-    de_genes_summary[,2],
+    de_genes_summary[2],
     sep = "."
   )
-
-  sapply(1:length(combos[1,]), function (x) {
-    test_name <- paste0(
-      combos[1,x],
-      ".vs.",
-      combos[2,x]
-    )
 
     dir.create(paste0(combined_folder,
                       "/DE_tables/",
@@ -179,8 +173,6 @@ find_de_combined <-  function(combos,
                     test_name,
                     "_alltags.csv"))
 
-  })
-
   return(final_table)
 }
 
@@ -229,28 +221,26 @@ find_combined_de <-  function(keyfile,
   }
 
   sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
-  final_table <- find_de_combined(combos,
-                                  lfc_suffixes,
-                                  combined_folder,
-                                  annotation,
-                                  funcs,
-                                  func_focus,
-                                  paths)
-  sink()
-
-  print("Begin GO analysis")
 
   if (go == TRUE) {
+    print("Begin GO analysis")
     devtools::source_url(
       "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
     )
-
-    analyse_go(funcs, func_focus, project_folder, combos, paths, final_table)
   }
-}
 
-add_gene_funcs <- function(combos, funcs) {
-  sapply(seqalong(combos[1, ]), function(x) {
+  sapply(seq_along(combos[1, ]), function (comparison) {
+    final_table <- find_de_combined(combos,
+                                    lfc_suffixes,
+                                    combined_folder,
+                                    comparison,
+                                    annotation,
+                                    funcs,
+                                    func_focus,
+                                    paths)
 
+    if (go) {
+      analyse_go(funcs, func_focus, project_folder, combos, paths, final_table)
+    }
   })
 }
