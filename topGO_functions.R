@@ -79,6 +79,19 @@ analyse_topgo <- function(ontology_to_test,
 
   sig_res_fdr   <- all_res_fdr %>% filter(fdr < go_pval)
 
+  print(paste0("Significantly enriched ", ontology_to_test, " GO terms in ", de_direction, "regulated genes in ", test_name, " being downloaded"))
+  write_csv(sig_res_fdr,
+            paste0(out_dir,
+                   "/",
+                   test_name,
+                   "_",
+                   de_direction,
+                   "_",
+                   ontology_to_test,
+                   ".csv"))
+
+  print("Printing all genes in each significantly enriched GO terms.")
+
   sapply(sig_res_fdr$GO.ID, function(go_term) {
     go_genes    <- genesInTerm(go_data, go_term)
     de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
@@ -96,17 +109,8 @@ analyse_topgo <- function(ontology_to_test,
                      "_", go_term, "_genes.csv"))
   })
 
-  write_csv(sig_res_fdr,
-            paste0(out_dir,
-                   "/",
-                   test_name,
-                   "_",
-                   de_direction,
-                   "_",
-                   ontology_to_test,
-                   ".csv"))
-
   #### Make graphs
+  print("Making GO graphs")
   result_ks      <- runTest(go_data, algorithm = "classic", statistic = "ks")
   result_ks_elim <- runTest(go_data, algorithm = "elim",    statistic = "ks")
 
