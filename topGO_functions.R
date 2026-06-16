@@ -24,11 +24,11 @@ analyse_topgo <- function(ontology_to_test,
 
   if (de_direction == "up") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC > 1), 1]
+      de_table[which(de_table$edger_logFC > 1.5), 1]
     )[, 1]
   } else if (de_direction == "down") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC < 1), 1]
+      de_table[which(de_table$edger_logFC < 1.5), 1]
     )[, 1]
   } else {
     print("de direction confusion")
@@ -89,7 +89,7 @@ analyse_topgo <- function(ontology_to_test,
     
     write.csv(go_table,
               paste0(out_dir, "/genes-in-gos/", ontology_to_test,
-                     "/Surrounding.vs.Ungalled_", de_direction,
+                     "/", test_name, "_", de_direction,
                      "_", go_term, "_genes.csv"))
   })
 
