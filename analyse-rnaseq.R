@@ -31,7 +31,8 @@ analyse_rnaseq <-  function(project_folder,
                             mapman_focus,
                             annotation = FALSE, go = FALSE, fc_shrink = FALSE,
                             surrogate_variable = FALSE,
-                            batch = vector(mode = "character")) {
+                            batch = vector(mode = "character"),
+                            de_logfc = 1.5, go_pval = 0.05) {
 
   bioconductor_libs <-  c("edgeR",
                           "limma",
@@ -147,7 +148,9 @@ analyse_rnaseq <-  function(project_folder,
                    func_focus,
                    project_paths,
                    go,
-                   project_folder)
+                   project_folder,
+                   de_logfc,
+                   go_pval)
 
   print("Analysis finished")
 
