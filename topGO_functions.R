@@ -5,7 +5,9 @@ analyse_topgo <- function(ontology_to_test,
                           out_dir,
                           func_focus,
                           geneid_to_go,
-                          annotation) {
+                          annotation,
+                          de_logfc,
+                          go_pval) {
 
   ### args
   # ontology_to_test = "BP"
@@ -24,11 +26,11 @@ analyse_topgo <- function(ontology_to_test,
 
   if (de_direction == "up") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC > 1.5), 1]
+      de_table[which(de_table$edger_logFC > de_logfc), 1]
     )[, 1]
   } else if (de_direction == "down") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC < 1.5), 1]
+      de_table[which(de_table$edger_logFC * -1 > de_logfc), 1]
     )[, 1]
   } else {
     print("de direction confusion")
@@ -74,7 +76,7 @@ analyse_topgo <- function(ontology_to_test,
     mutate(fdr = p.adjust(Fisher_p_value, method = "BH"),
            Aspect = ontology_to_test)
 
-  sig_res_fdr   <- all_res_fdr %>% filter(fdr < 0.05)
+  sig_res_fdr   <- all_res_fdr %>% filter(fdr < go_pval)
 
   sapply(sig_res_fdr$GO.ID, function(go_term) {
     go_genes    <- genesInTerm(go_data, go_term)
@@ -185,7 +187,7 @@ go_plot_comparison <- function(ontology_to_test,
   dev.off()
 }
 
-analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths, annotation) {
+analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths, annotation, de_logfc, go_pval) {
 
   geneDescription_GO <- funcs %>%
     dplyr::select(func_focus, GO) %>%
@@ -217,7 +219,9 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                     paste0(project_paths[3], "/Combined/GO_tests/"),
                     func_focus,
                     geneid_to_go,
-                    annotation)
+                    annotation,
+                    de_logfc,
+                    go_pval)
     })
     # map2(
     #   rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
