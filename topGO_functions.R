@@ -97,6 +97,8 @@ analyse_topgo <- function(ontology_to_test,
     de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
     print(paste0("Getting genes for ", go_term))
 
+    print(paste("annotation is", annotation))
+
     if (annotation == TRUE) {
       go_table <- funcs[funcs[, 1] %in% de_go_genes, ]
     } else {
