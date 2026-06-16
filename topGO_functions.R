@@ -222,10 +222,10 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                            paste0(combos[1,x], ".vs.", combos[2,x]),
                            "_detags_1point5FC.csv"),
                     paste0(project_paths[3], "/Combined/GO_tests/"),
+                    funcs,
                     func_focus,
                     geneid_to_go,
                     annotation,
-                    funcs,
                     de_logfc,
                     go_pval)
     })
