@@ -185,7 +185,9 @@ find_combined_de <-  function(keyfile,
                               func_focus,
                               paths,
                               go,
-                              project_folder) {
+                              project_folder,
+                              de_logfc,
+                              go_pval) {
 
   combined_folder <- paste0(
     paths[3],
@@ -240,7 +242,7 @@ find_combined_de <-  function(keyfile,
                                     paths)
 
     if (go) {
-      analyse_go(funcs, func_focus, project_folder, combos, paths, final_table)
+      analyse_go(funcs, func_focus, project_folder, combos, paths, final_table, de_logfc, go_pval)
     }
   })
 }
