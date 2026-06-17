@@ -220,6 +220,8 @@ find_combined_de <-  function(keyfile,
     } else {
       errorCondition("File format not recognised")
     }
+  } else {
+    funcs <- NULL
   }
 
   sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
