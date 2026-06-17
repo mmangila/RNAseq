@@ -6,7 +6,7 @@ analyse_topgo <- function(ontology_to_test,
                           funcs,
                           func_focus,
                           geneid_to_go,
-                          annotation,
+                          alltags_table,
                           de_logfc,
                           go_pval) {
 
@@ -97,9 +97,7 @@ analyse_topgo <- function(ontology_to_test,
     de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
     print(paste0("Getting genes for ", go_term))
 
-    print(paste("annotation is", annotation))
-
-    if (annotation == TRUE) {
+    if (funcs != NULL) {
       go_table <- funcs[funcs[, 1] %in% de_go_genes, ]
     } else {
       go_table <- de_go_genes
@@ -194,7 +192,7 @@ go_plot_comparison <- function(ontology_to_test,
   dev.off()
 }
 
-analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths, annotation, de_logfc, go_pval) {
+analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths, alltags_table, de_logfc, go_pval) {
 
   geneDescription_GO <- funcs %>%
     dplyr::select(func_focus, GO) %>%
@@ -227,7 +225,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                     funcs,
                     func_focus,
                     geneid_to_go,
-                    annotation,
+                    alltags_table,
                     de_logfc,
                     go_pval)
     })
