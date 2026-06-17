@@ -96,12 +96,7 @@ analyse_topgo <- function(ontology_to_test,
     go_genes    <- genesInTerm(go_data, go_term)
     de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
     print(paste0("Getting genes for ", go_term))
-
-    if (funcs[, 1] > 1) {
-      go_table <- funcs[funcs[, 1] %in% de_go_genes, ]
-    } else {
-      go_table <- de_go_genes
-    }
+    go_table <- funcs[funcs[, 1] %in% de_go_genes, ]
     
     write.csv(go_table,
               paste0(out_dir, "/genes-in-gos/", ontology_to_test,
