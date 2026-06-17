@@ -224,7 +224,7 @@ find_combined_de <-  function(keyfile,
 
   sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
 
-  if (go == TRUE) {
+  if (go & annotation) {
     print("Begin GO analysis")
     devtools::source_url(
       "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
@@ -241,7 +241,7 @@ find_combined_de <-  function(keyfile,
                                     func_focus,
                                     paths)
 
-    if (go) {
+    if (go & annotation) {
       analyse_go(funcs, func_focus, project_folder, combos, paths, final_table, de_logfc, go_pval)
     }
   })
