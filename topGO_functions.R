@@ -23,7 +23,7 @@ analyse_topgo <- function(ontology_to_test,
   dir.create(out_dir, showWarnings = FALSE)
   dir.create(paste0(out_dir, "/genes-in-gos/", ontology_to_test), showWarnings = FALSE, recursive = TRUE)
   de_table <- read_csv(de_table_file)
-  gene_universe <- de_table %>% pull(func_focus)
+  gene_universe <- alltags_table %>% pull(func_focus)
 
   if (de_direction == "up") {
     de_locus <- as.data.frame(
@@ -220,7 +220,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                            paste0(combos[1,x], ".vs.", combos[2,x]),
                            "/",
                            paste0(combos[1,x], ".vs.", combos[2,x]),
-                           "_detags_1point5FC.csv"),
+                           "_detags.csv"),
                     paste0(project_paths[3], "/Combined/GO_tests/"),
                     funcs,
                     func_focus,
