@@ -21,7 +21,11 @@ analyse_topgo <- function(ontology_to_test,
   # #####
 
   dir.create(out_dir, showWarnings = FALSE)
-  dir.create(paste0(out_dir, "/genes-in-gos/", ontology_to_test), showWarnings = FALSE, recursive = TRUE)
+  dir.create(paste(out_dir,
+                   "genes-in-gos",
+                   ontology_to_test,
+                   paste(test_name, de_direction, "GO", sep = "_"), sep = "/"),
+             showWarnings = FALSE, recursive = TRUE)
   de_table <- read_csv(de_table_file)
   gene_universe <- alltags_table %>% pull(func_focus)
 
