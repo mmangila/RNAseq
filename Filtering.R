@@ -1,42 +1,27 @@
 
 
 create_folders <- function(project_paths) {
-
-
   lapply(project_paths, function (x) dir.create(x, showWarnings = FALSE))
-  dir.create(
-    paste0(project_paths[3], "/MDS"),
-    showWarnings = FALSE
-  )
+  dir.create(paste0(project_paths[3], "/MDS"),
+             showWarnings = FALSE)
 
-  keyfile <- read_csv(project_paths[4])
-  
-  return(keyfile)
+  metadata <- readr::read_csv(project_paths[4])
+  return(metadata)
 }
 
 file_paths <- function(project_folder, analysis) {
   paths <- vector(mode = "character", length = 0)
 
-  paths <- c(paths, paste0(
-    project_folder,
-    "/",
-    analysis
-  ))
+  paths <- c(paths, paste(project_folder, analysis, sep = "/"))
 
-  time_stamp <- format(
-    Sys.time(),
-    "%Y-%m-%d-%H%M"
-  )
+  time_stamp <- format(Sys.time(), "%Y-%m-%d-%H%M")
 
   paths <- c(paths, readline(
     "Enter the location of your featureCounts results here: "
   ))
 
-  paths <- c(paths, paste0(
-    paths[1],
-    "/DE_analysis_",
-    time_stamp
-  ))
+  paths <- c(paths,
+             paste(paths[1], "DE_analysis_", time_stamp, sep = "/"))
 
   paths <- c(paths, readline("Enter the location of the keyfile here: "))
   paths <- c(paths, paste0(paths[1], "/Mapping_stats"))
