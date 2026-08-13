@@ -121,7 +121,7 @@ analyse_rnaseq <-  function(project_folder,
                               func_path, func_focus)
   dge_deseq <- read_data(keyfile, group, project_paths)
 
-  batch_design <- paste(c(group, batch), collapse = " + ")
+  batch_design <- create_design(group, batch)
 
   # edgeRCode
   print("Running edgeR")
@@ -134,11 +134,14 @@ analyse_rnaseq <-  function(project_folder,
 
   # DESEQ2Code
   print("Running DESeq2")
-  find_de_deseq(
-    dge_deseq,
-    keyfile, group, batch_design,
-    padj, project_paths, fc_shrink, surrogate_variable
-  )
+  find_de_deseq(dge_deseq,
+                keyfile,
+                group,
+                batch_design,
+                padj,
+                project_paths,
+                fc_shrink,
+                surrogate_variable)
   # Find the union
   print("Combining the analyses")
   find_combined_de(keyfile,
@@ -154,7 +157,15 @@ analyse_rnaseq <-  function(project_folder,
                    go_pval)
 
   print("Analysis finished")
+}
 
+create_design <- function (group, batch) {
+  all_design_terms <- unlist(lapply(seq_along(batch_vars), function (size) {
+    subsets <- combn(batch_vars, size, simplify = FALSE)
+    design_terms <- sapply(subsets, function (x) {paste(x, collapse = ":")})
+    return(design_terms)
+  }))
 
-
+  batch_design <- paste0("~0+", paste(all_design_terms, collapse = "+"))
+  return(as.formula(batch_design))
 }
