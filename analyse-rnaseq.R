@@ -1,3 +1,4 @@
+library(ggplot2)
 text_size_theme_8 <- theme(axis.text    = element_text(size  = 8),
                            axis.title   = element_text(size  = 8),
                            legend.title = element_text(size  = 8),
