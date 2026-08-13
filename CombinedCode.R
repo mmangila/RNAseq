@@ -22,10 +22,6 @@ find_de_combined <-  function(combos,
     sep = "."
   )
 
-    dir.create(paste0(combined_folder,
-                      "/DE_tables/",
-                      test_name), showWarnings = FALSE)
-
     edger_deset <- read.csv(paste0(
       paths[3],
       "/edgeR/DE_tables/",
@@ -35,12 +31,6 @@ find_de_combined <-  function(combos,
       "_alltags.csv"
     ))
 
-
-    colnames(edger_deset) <-  paste("edger",
-                                    colnames(edger_deset),
-                                    sep = "_")
-    colnames(edger_deset)[which(colnames(edger_deset) == "edger_X")] <- "X"
-
     deseq_deset <- read.csv(paste0(
       paths[3],
       "/DESEQ2/DE_tables/",
@@ -49,131 +39,71 @@ find_de_combined <-  function(combos,
       test_name,
       "_alltags.csv"
     ))
-    colnames(deseq_deset) <-  paste("deseq",
-                                    colnames(deseq_deset),
-                                    sep = "_")
-    colnames(deseq_deset)[which(colnames(deseq_deset) == "deseq_X")] = "X"
 
-    sapply(1:3, function (y) {
+    row.names(deseq_deset) <- deseq_deset$X
+    row.names(edger_deset) <- edger_deset$X
 
+    used_loci <- union(deseq_deset$X, edger_deset$X)
 
-      print(paste0(
-        "Finding differentially expressed genes in ",
-        test_name,
-        " with a fold change greater than ",
-        lfc_suffixes[y,1], "."
-      ))
+    tmp_data  <- sapply(used_loci, function (gene) {
+  
+      edger_logfc <- edger_deset[gene, "logFC"]
+      deseq_logfc <- deseq_deset[gene, "log2FoldChange"]
+      edger_pval  <- edger_deset[gene, "adj.P.Val"]
+      deseq_pval  <- deseq_deset[gene, "padj"]
 
-      edger_genes <-  try(read.csv(paste0(paths[3],
-                                          "/edgeR/DE_tables/",
-                                          test_name,
-                                          "/",
-                                          test_name,
-                                          lfc_suffixes[y,2]))$X)
+      if (is.na(edger_logfc)) edger_logfc <- 0
+      if (is.na(deseq_logfc)) deseq_logfc <- 0
+      if (is.na(edger_pval))  edger_pval  <- 1
+      if (is.na(deseq_pval))  deseq_pval  <- 1
 
-      if ("try-error" %in% class(edger_genes)) {
-        edger_genes <- vector()
-      }
+      return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
+               min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)
+               ))
+  })
 
-      deseq_genes <-  try(read.csv(paste0(paths[3],
-                                          "/DESEQ2/DE_tables/",
-                                          test_name,
-                                          "/",
-                                          test_name,
-                                          lfc_suffixes[y, 2]))$X)
+  union_deset <- data.frame(X               = used_loci,
+                          Union_logFC     = tmp_data[1, ],
+                          Union_padj      = tmp_data[2, ],
+                          Intersect_logFC = tmp_data[3, ],
+                          Intersect_padj  = tmp_data[4, ])
 
-      if ("try-error" %in% class(deseq_genes)) {
-        deseq_genes <- vector()
-      }
+  union_deset[, func_focus] <- union_deset$X
 
-      if (length(edger_genes) == 0 && length(deseq_genes) == 0) {
-        print(paste0(
-          "Found no differentially expressed genes in ",
-          test_name,
-          " with a fold change greater than ",
-          lfc_suffixes[y,1], "."
-        ))
-      } else if (length(edger_genes) == 0) {
-        comb_genes <- deseq_genes
-      } else if (length(deseq_genes) == 0) {
-        comb_genes <- edger_genes
-      } else {
-        comb_genes <- union(edger_genes, deseq_genes)
-      }
-      edger_table <- edger_deset[which(edger_deset$X %in% comb_genes), ]
-      deseq_table <- deseq_deset[which(deseq_deset$X %in% comb_genes), ]
+  if (annotation) {
+    annotated_deset <- merge(funcs[funcs[, func_focus] %in% used_loci, ], union_deset,
+                                 by = func_focus)
+  } else {
+    annotated_deset <- union_deset
+  }
 
-      gene_table  <- merge(data.table(edger_table,
-                                      key = names(edger_table)),
-                           data.table(deseq_table,
-                                      key = names(deseq_table)))
-      colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
+  annotated_deset <- annotated_deset[, colnames(annotated_deset) != "X"]
 
-      if (annotation) {
-        gene_funcs  <- funcs[which(
-          funcs[, which(colnames(funcs) == func_focus)] %in%
-            comb_genes
-        ), ]
-        final_table <- try(merge(data.table(gene_funcs,
-                                            key = names(gene_funcs)),
-                                 data.table(gene_table,
-                                            key = names(gene_table))))
+  sapply(c("Union", "Intersect"), function (combo_mode) {
+  
+    combo_vars      <- !grepl(combo_mode, names(annotated_deset))
+    padj_col        <- sum(combo_vars)
+    logfc_col       <- padj_col - 1
+    combined_allset <- annotated_deset[, combo_vars]
+  
+    combined_allset$logFC <- combined_allset[, logfc_col]
+    combined_allset$padj  <- combined_allset[, padj_col]
+    combined_allset       <- combined_allset[, c(-logfc_col, -padj_col)]
+  
+    combined_deset  <- combined_allset[combined_allset$padj < pval, ]
+    combined_1.5set <- combined_deset[combined_deset$logFC  < 1.5,  ]
+    combined_2set   <- combined_deset[combined_deset$logFC  < 2,    ]
 
-        if ("try-error" %in% class(final_table)) {
-          final_table <- data.frame(X         = character(),
-                                    logFC     = numeric(),
-                                    AveExpr   = numeric(),
-                                    t         = numeric(),
-                                    P.Value   = numeric(),
-                                    adj.P.Val = numeric(),
-                                    B         = numeric())
-        }
-      } else {
-        final_table <- data.table(gene_table, key = names(gene_table))
-      }
-
-      if (length(final_table[, 1]) > 0) {
-        write_csv(final_table,
-                  file = paste0(combined_folder,
-                                "/DE_tables/",
-                                test_name,
-                                "/",
-                                test_name,
-                                lfc_suffixes[y, 2]))
-
-        print(table(sign(final_table$edger_logFC)))
-      }
+    de_table_path <- paste(combined_folder, combo_mode, "DE_tables", test_name, sep = "/")
+    dir.create(de_table_path,
+               showWarnings = FALSE, recursive = TRUE)
+    write.csv(combined_allset,
+              paste(de_table_path, paste0(test_name, "_alltags.csv"), sep = "/"))
+    sapply(seq_along(lfc_suffixes$Level), function (x) {
+      write.csv(combined_deset[combined_deset$logFC < lfc_Suffixes$Level[x], ]
+                paste(de_table_path, paste0(test_name, lfc_Suffixes$Suffix[x]), sep = "/"))
     })
-    gene_table <- try(merge(data.table(edger_deset,
-                                       key = names(edger_deset)),
-                            data.table(deseq_deset,
-                                       key = names(deseq_deset))))
-    colnames(gene_table)[which(colnames(gene_table) == "X")] <- func_focus
-
-    if (annotation) {
-      gene_funcs  <-  funcs[which(funcs[,
-                                        which(
-                                          colnames(funcs) == func_focus
-                                        )]
-      %in% union(deseq_deset$X, edger_deset$X)), ]
-
-      final_table <- try(merge(data.table(gene_funcs,
-                                          key = names(gene_funcs)),
-                               data.table(gene_table,
-                                          key = names(gene_table))))
-    } else {
-      final_table <- data.table(gene_table, key = names(gene_table))
-    }
-    write_csv(
-      final_table,
-      file = paste0(combined_folder,
-                    "/DE_tables/",
-                    test_name,
-                    "/",
-                    test_name,
-                    "_alltags.csv"))
-
-  return(final_table)
+  })
 }
 
 
@@ -189,28 +119,14 @@ find_combined_de <-  function(keyfile,
                               de_logfc,
                               go_pval) {
 
-  combined_folder <- paste0(
-    paths[3],
-    "/Combined"
-  )
-  dir.create(
-    combined_folder,
-    showWarnings = FALSE
-  )
-  dir.create(
-    paste0(combined_folder, "/DE_tables/"),
-    showWarnings = FALSE
-  )
+  combined_folder <- paste0(paths[3], "/Combined")
+  
+  dir.create(paste(combined_folder, "Union", sep = "/"),
+             showWarnings = FALSE, recursive = TRUE)
+  dir.create(paste(combined_folder, "Intersect"),
+             showWarnings = FALSE, recursive = TRUE)
 
-  combos <- eval(
-    parse(
-      text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(",
-        group,
-        "))[,1], 2)"
-      )
-    )
-  )
+  combos <- combn(as.data.frame(keyfile %>% distinct(test_group))[,1], 2)
 
   if (annotation) {
     if (grepl(".tsv", func_path)) {
@@ -218,13 +134,15 @@ find_combined_de <-  function(keyfile,
     } else if (grepl(".csv", func_path)) {
       funcs <- read.csv(file = func_path)
     } else {
-      errorCondition("File format not recognised")
+      warning("File format not recognised. Continuing without annotation.")
     }
   } else {
     funcs <- NULL
   }
 
-  sink(file = paste0(combined_folder, "/DE_tables/de_genes_summary.txt"))
+  sink(file = paste0(combined_folder, "/de_genes_summary.txt"))
+
+  if (!is.null(funcs)) 
 
   if (go & annotation) {
     print("Begin GO analysis")
