@@ -10,7 +10,7 @@ analyse_rnaseq <-  function(project_folder,
                             mapman_focus,
                             annotation = FALSE, fc_shrink = FALSE,
                             surrogate_variable = FALSE,
-                            batch = vector(mode = "character"),
+                            batch_vars = vector(mode = "character"),
                             de_logfc = 1.5, go_pval = 0.05) {
 
   bioconductor_libs <-  c("edgeR",
@@ -100,7 +100,7 @@ analyse_rnaseq <-  function(project_folder,
                               funcs, func_focus)
   dge_deseq <- read_data(keyfile, group, project_paths)
 
-  batch_design <- create_design(group, batch)
+  batch_design <- create_design(group, batch_vars)
 
   # edgeRCode
   print("Running edgeR")
@@ -160,7 +160,7 @@ analyse_rnaseq <-  function(project_folder,
   print("Analysis finished")
 }
 
-create_design <- function (group, batch) {
+create_design <- function (group, batch_vars) {
   all_design_terms <- unlist(lapply(seq_along(batch_vars), function (size) {
     subsets <- combn(batch_vars, size, simplify = FALSE)
     design_terms <- sapply(subsets, function (x) {paste(x, collapse = ":")})
