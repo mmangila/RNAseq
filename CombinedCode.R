@@ -1,10 +1,3 @@
-lfc_suffixes <- data.frame(
-  Level  =  c(0, 1.5, 2),
-  Suffix =  c("_detags.csv",
-              "_detags_1point5FC.csv",
-              "_detags_2FC.csv")
-)
-
 find_de_combined <-  function(combos,
                               lfc_suffixes,
                               combined_folder,
