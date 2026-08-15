@@ -12,13 +12,9 @@ find_de_deseq <- function(dge_deseq,
     dge_deseq$counts
   )
 
-  dds <- eval(parse(text = paste0(
-    "DESeqDataSetFromMatrix(",
-    "countData = dge_deseq$counts,",
-    "colData   = keyfile,",
-    "design    = ~ 1 + ",
-    batch_design, ")"
-  )))
+  dds <- DESeqDataSetFromMatrix(countData = dge_deseq$counts,
+                                colData   = keyfile,
+                                design    = batch_design)
 
   print("Estimating size factors")
 
