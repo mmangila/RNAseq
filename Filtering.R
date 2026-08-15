@@ -41,7 +41,6 @@ install_libraries <- function(libraries, installer, mirror) {
 }
 
 text_size_theme <- function (text_pt, label = FALSE) {
-  if 
   
   text_size           <- ggplot2::element_text(size = text_pt)
   transparent_element <- ggplot2::element_rect(fill = "transparent")
