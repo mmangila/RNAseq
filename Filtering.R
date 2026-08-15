@@ -45,7 +45,7 @@ text_size_theme <- function (text_pt, label = FALSE) {
   text_size           <- ggplot2::element_text(size = text_pt)
   transparent_element <- ggplot2::element_rect(fill = "transparent")
   blank_element       <- ggplot2::element_blank()
-  text_axis           <- ggplot2::element_text(angle = 45, hjust = 1),
+  text_axis           <- ggplot2::element_text(angle = 45, hjust = 1)
 
   initial_theme <- ggplot2::theme(axis.text    = text_size,
                                   axis.title   = text_size,
