@@ -114,15 +114,12 @@ find_combined_de <-  function(keyfile,
 
   combined_folder <- paste0(paths[3], "/Combined")
   
-  
   sapply(c("Union", "Intersect"), function (de_combo) {
     dir.create(paste(combined_folder, de_combo, "GO_tests"),
                showWarnings = FALSE, recursive = TRUE)
   })
 
   combos <- combn(as.data.frame(keyfile %>% distinct(group))[,1], 2)
-
-  
 
   sink(file = paste0(combined_folder, "/de_genes_summary.txt"))
 
@@ -135,6 +132,5 @@ find_combined_de <-  function(keyfile,
                    funcs,
                    func_focus,
                    paths)
-    })
   })
 }
