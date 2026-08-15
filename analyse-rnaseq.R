@@ -8,7 +8,7 @@ analyse_rnaseq <-  function(project_folder,
                             group,
                             padj,
                             mapman_focus,
-                            annotation = FALSE, go = FALSE, fc_shrink = FALSE,
+                            annotation = FALSE, fc_shrink = FALSE,
                             surrogate_variable = FALSE,
                             batch = vector(mode = "character"),
                             de_logfc = 1.5, go_pval = 0.05) {
