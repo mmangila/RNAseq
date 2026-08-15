@@ -53,7 +53,7 @@ text_size_theme <- function (text_pt, label = FALSE) {
                                   legend.text  = text_size,
                                   axis.text.x  = text_axis)
 
-  if (label = TRUE) {
+  if (label) {
     final_theme <- initial_theme +
       ggplot2::theme(panel.grid.major      = blank_element,
                      panel.grid.minor      = blank_element,
