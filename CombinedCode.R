@@ -1,11 +1,11 @@
-find_de_combined <-  function(combos,
-                              lfc_suffixes,
-                              combined_folder,
-                              comp_num,
-                              annotation,
-                              funcs,
-                              func_focus,
-                              paths) {
+combine_desets <-  function(combos,
+                            lfc_suffixes,
+                            combined_folder,
+                            comp_num,
+                            annotation,
+                            funcs,
+                            func_focus,
+                            paths) {
 
   de_genes_summary <- combos[, comp_num]
   test_name <- paste(
@@ -104,7 +104,7 @@ find_combined_de <-  function(keyfile,
                               group,
                               lfc_suffixes,
                               annotation,
-                              func_path,
+                              funcs,
                               func_focus,
                               paths,
                               go,
@@ -114,48 +114,27 @@ find_combined_de <-  function(keyfile,
 
   combined_folder <- paste0(paths[3], "/Combined")
   
-  dir.create(paste(combined_folder, "Union", sep = "/"),
-             showWarnings = FALSE, recursive = TRUE)
-  dir.create(paste(combined_folder, "Intersect"),
-             showWarnings = FALSE, recursive = TRUE)
+  
+  sapply(c("Union", "Intersect"), function (de_combo) {
+    dir.create(paste(combined_folder, de_combo, "GO_tests"),
+               showWarnings = FALSE, recursive = TRUE)
+  })
 
   combos <- combn(as.data.frame(keyfile %>% distinct(test_group))[,1], 2)
 
-  if (annotation) {
-    if (grepl(".tsv", func_path)) {
-      funcs <- read.table(func_path, sep = "\t", header = TRUE)
-    } else if (grepl(".csv", func_path)) {
-      funcs <- read.csv(file = func_path)
-    } else {
-      warning("File format not recognised. Continuing without annotation.")
-    }
-  } else {
-    funcs <- NULL
-  }
+  
 
   sink(file = paste0(combined_folder, "/de_genes_summary.txt"))
 
-  if (!is.null(funcs)) 
-
-  if (go & annotation) {
-    print("Begin GO analysis")
-    devtools::source_url(
-      "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
-    )
-  }
-
   sapply(seq_along(combos[1, ]), function (comparison) {
-    final_table <- find_de_combined(combos,
-                                    lfc_suffixes,
-                                    combined_folder,
-                                    comparison,
-                                    annotation,
-                                    funcs,
-                                    func_focus,
-                                    paths)
-
-    if (go & annotation) {
-      analyse_go(funcs, func_focus, project_folder, combos, paths, final_table, de_logfc, go_pval)
-    }
+    combine_desets(combos,
+                   lfc_suffixes,
+                   combined_folder,
+                   comparison,
+                   annotation,
+                   funcs,
+                   func_focus,
+                   paths)
+    })
   })
 }
