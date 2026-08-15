@@ -79,12 +79,13 @@ analyse_rnaseq <-  function(project_folder,
       "Enter the location of the genome functional annotation here",
       "(Valid format: .csv): "
     ))
+    funcs <- read_files(func_path)
     func_focus <- readline(paste(
       "Which column of the functional annotation",
       "is reflected in the featureCounts results? "
     ))
   } else {
-    func_path <- "None"
+    funcs <- NULL
     func_focus <- "X"
   }
 
@@ -96,7 +97,7 @@ analyse_rnaseq <-  function(project_folder,
                               group,
                               project_paths,
                               annotation,
-                              func_path, func_focus)
+                              funcs, func_focus)
   dge_deseq <- read_data(keyfile, group, project_paths)
 
   batch_design <- create_design(group, batch)
@@ -126,13 +127,30 @@ analyse_rnaseq <-  function(project_folder,
                    group,
                    lfc_suffixes,
                    annotation,
-                   func_path,
+                   funcs,
                    func_focus,
                    project_paths,
                    go,
                    project_folder,
                    de_logfc,
                    go_pval)
+
+  # Find GO terms if they exist
+
+  if (!is.null(funcs)) {
+    print("Run GO analysis?")
+    go_choice <- readline("Yes/No")
+
+    if (tolower(go_choice) %in% c("yes", "yeah", "ye", "yea", "y", "agree") {
+      print("Begin GO analysis")
+      devtools::source_url(
+        "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
+      )
+      analyse_go(funcs, func_focus,
+                 project_folder, combos, paths,
+                 de_logfc, go_pval)
+    }
+  }
 
   print("Analysis finished")
 }
@@ -146,4 +164,14 @@ create_design <- function (group, batch) {
 
   batch_design <- paste0("~0+", paste(all_design_terms, collapse = "+"))
   return(as.formula(batch_design))
+}
+
+read_files <- function (file_to_read) {
+  if (grepl(".tsv", file_to_read)) {
+      funcs <- read.table(file_to_read, sep = "\t", header = TRUE)
+    } else if (grepl(".csv", file_to_read)) {
+      funcs <- read.csv(file = file_to_read)
+    } else {
+      warning("File format not recognised. Continuing without annotation.")
+    }
 }
