@@ -12,12 +12,7 @@ find_de_edger <- function(old_dge,
 
   print(batch_design)
 
-  design <- eval(parse(text = paste0(
-    "model.matrix(~ 0 + ",
-    batch_design,
-    ", data = keyfile)"
-  )))
-
+  design <- model.matrix(batch_design, data = keyfile)
   group_levels <- eval(parse(text = paste0("levels(keyfile$", group, ")")))
   print(group_levels)
 
