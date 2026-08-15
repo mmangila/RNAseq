@@ -141,7 +141,7 @@ analyse_rnaseq <-  function(project_folder,
     print("Run GO analysis?")
     go_choice <- readline("Yes/No")
 
-    if (tolower(go_choice) %in% c("yes", "yeah", "ye", "yea", "y", "agree") {
+    if (tolower(go_choice) %in% c("yes", "yeah", "ye", "yea", "y", "agree")) {
       print("Begin GO analysis")
       devtools::source_url(
         "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
