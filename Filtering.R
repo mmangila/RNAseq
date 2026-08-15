@@ -11,9 +11,7 @@ create_folders <- function(project_paths) {
 
 file_paths <- function(project_folder, analysis) {
   paths <- vector(mode = "character", length = 0)
-
   paths <- c(paths, paste(project_folder, analysis, sep = "/"))
-
   time_stamp <- format(Sys.time(), "%Y-%m-%d-%H%M")
 
   paths <- c(paths, readline(
@@ -41,6 +39,36 @@ install_libraries <- function(libraries, installer, mirror) {
     library(x, character.only = TRUE)
   })
 }
+
+text_size_theme <- function (text_pt, label = FALSE) {
+  if 
+  
+  text_size           <- ggplot2::element_text(size = text_pt)
+  transparent_element <- ggplot2::element_rect(fill = "transparent")
+  blank_element       <- ggplot2::element_blank()
+  text_axis           <- ggplot2::element_text(angle = 45, hjust = 1),
+
+  initial_theme <- ggplot2::theme(axis.text    = text_size,
+                                  axis.title   = text_size,
+                                  legend.title = text_size,
+                                  legend.text  = text_size,
+                                  axis.text.x  = text_axis)
+
+  if (label = TRUE) {
+    final_theme <- initial_theme +
+      ggplot2::theme(panel.grid.major      = blank_element,
+                     panel.grid.minor      = blank_element,
+                     legend.background     = transparent_element,
+                     legend.box.background = transparent_element,
+                     panel.background      = transparent_element,
+                     plot.background       = ggplot2::element_rect(fill = "transparent",
+                                                                   color = NA))
+  } else {
+    final_theme <- initial_theme
+  }
+
+  return(final_theme)
+}
 assignment_summary <- function(paths, keyfile) {
 
   print("Reading in files")
@@ -49,13 +77,10 @@ assignment_summary <- function(paths, keyfile) {
     pattern = "*.counts.summary"
   )
   count_files <- paste0(paths[2], "/", files)
-  fcs         <- do.call(
-    "cbind",
-    lapply(
-      count_files,
-      function(fn) data.frame(read.delim(fn, row.names = 1))
-    )
-  )
+  fcs         <- do.call("cbind",
+                         lapply(count_files, function (fn) {
+                           data.frame(read.delim(fn, row.names = 1))
+                         }))
 
   print("Creating mapping plots")
 
@@ -69,25 +94,22 @@ assignment_summary <- function(paths, keyfile) {
   prop_plot      <- melt(prop_t)
 
   plot_data      <- prop_plot
+  num_cols       <- length(levels(plot_data$Var2))
 
-  plot_colours   <- rev(
-    c("black", "grey",
-      viridis_pal(option = "C")(n = length(levels(plot_data$Var2))))
-  )
+  plot_colours   <- rev(c("black", "grey",
+                          viridis_pal(option = "C")(n = num_cols)))
 
   print("Proportional mapped plot")
 
   pdf(paste0(paths[5], "/percent_mapped_plot.pdf"), w = 8, h = 4)
-  print(
-    ggplot(plot_data, aes(x = Var1, y = rev(value), fill = rev(Var2))) +
-      geom_bar(stat = "identity")                                      +
-      xlab("Sample")                                                   +
-      ylab("Percentage of reads")                                      +
-      scale_fill_manual(values = plot_colours, name = "Mapping cat")   +
-      text_size_theme_8_labels                                         +
-      theme_classic()                                                  +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  )
+  print(ggplot(plot_data, aes(x = Var1, y = rev(value), fill = rev(Var2))) +
+          geom_bar(stat = "identity")                                      +
+          xlab("Sample")                                                   +
+          ylab("Percentage of reads")                                      +
+          scale_fill_manual(values = plot_colours, name = "Mapping cat")   +
+          text_size_theme(8, TRUE)                                         +
+          theme_classic()                                                  +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1)))
   dev.off()
 
   ###Assigned reads as total read number
@@ -96,26 +118,27 @@ assignment_summary <- function(paths, keyfile) {
 
   pdf(paste0(paths[5], "/total_mapped_plot.pdf"), w = 6, h = 4)
   plot_data <- fcs_plot
-  print(
-    ggplot(plot_data, aes(x = Var2, y = value, fill = Var1))         +
-      geom_bar(stat = "identity")                                    +
-      xlab("Sample")                                                 +
-      ylab("Number of reads")                                        +
-      scale_fill_manual(values = plot_colours, name = "Mapping cat") +
-      theme_classic()                                                +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+  print(ggplot(plot_data, aes(x = Var2, y = value, fill = Var1))         +
+          geom_bar(stat = "identity")                                    +
+          xlab("Sample")                                                 +
+          ylab("Number of reads")                                        +
+          scale_fill_manual(values = plot_colours, name = "Mapping cat") +
+          theme_classic()                                                +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1)))
   dev.off()
 }
 
 read_data <- function(keyfile, group, paths) {
   ## Read in data
-  keyfile <- as.data.frame(keyfile)
-  samples <- keyfile[, 1]
-  sample_groups <- keyfile[, which(colnames(keyfile) == group)]
+  keyfile       <- as.data.frame(keyfile)
+  samples       <- keyfile[, 1]
+  sample_groups <- keyfile[, group]
 
   count_files <- paste0(paths[2], "/", samples, ".counts")
 
-  tmp <- read.delim(count_files[[1]], header = TRUE, skip = 1)
+  tmp <- read.delim(count_files[[1]],
+                    header = TRUE, skip = 1)
+  
   gene_lengths        <- as.numeric(tmp[, "Length"])
   names(gene_lengths) <- tmp[, "Geneid"]
   rm(tmp)
@@ -124,10 +147,7 @@ read_data <- function(keyfile, group, paths) {
                  columns = c(1, 7),
                  group = sample_groups,
                  labels = as.character(samples))
-  dge_raw <- dge
   gene_names <- as.character(rownames(dge$counts))
-  gene_names_raw <- as.character(rownames(dge_raw$counts))
-
   return(dge)
 }
 
@@ -154,7 +174,7 @@ filter_wrapper <-  function(keyfile,
   old_dge        <- dge
   old_gene_names <- gene_names
 
-  dge <- filtering_step(raw_counts, old_dge)
+  dge        <- filtering_step(raw_counts, old_dge)
   gene_names <- as.character(rownames(dge$counts))
 
   if (annotation) {
@@ -204,18 +224,9 @@ filtering_step <- function(raw_counts, dge) {
 
   print("Table of genes that passed or failed the filter")
   print(table(loci_to_keep))
-  hist(
-    log10(
-      rowSums(
-        raw_counts[
-          which(rownames(raw_counts) %in%
-                  names(which(loci_to_keep == TRUE))),
-          sample_num
-        ]
-      )
-    ),
-    breaks = 100
-  )
+  hist(log10(rowSums(raw_counts[which(rownames(raw_counts) %in%
+                                  names(which(loci_to_keep == TRUE))),
+                                sample_num])), breaks = 100)
 
   confirm      <- readline("Accept these filters? y/n ")
   filtered_dge <- continue_filter(confirm, raw_counts, dge, loci_to_keep)
