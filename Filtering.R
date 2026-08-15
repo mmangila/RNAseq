@@ -19,7 +19,7 @@ file_paths <- function(project_folder, analysis) {
   ))
 
   paths <- c(paths,
-             paste(paths[1], "DE_analysis_", time_stamp, sep = "/"))
+             paste0(paths[1], "/DE_analysis_", time_stamp))
 
   paths <- c(paths, readline("Enter the location of the keyfile here: "))
   paths <- c(paths, paste0(paths[1], "/Mapping_stats"))
