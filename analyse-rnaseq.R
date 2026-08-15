@@ -146,6 +146,11 @@ analyse_rnaseq <-  function(project_folder,
       devtools::source_url(
         "https://github.com/mmangila/RNAseq/raw/main/topGO_functions.R"
       )
+
+      de_logfc <- readline("Input minimum gene logFC for GO analysis: ")
+      go_pval  <- readline("Input GO term p-value threshold: ") 
+
+      
       analyse_go(funcs, func_focus,
                  project_folder, combos, paths,
                  de_logfc, go_pval)
