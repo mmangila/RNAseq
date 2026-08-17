@@ -74,6 +74,8 @@ analyse_rnaseq <-  function(project_folder,
   )
   colnames(keyfile)[1] <- "Sample_ID"
 
+  keyfile$sample_group <- keyfile[, group]
+
   if (annotation) {
     func_path <- readline(paste(
       "Enter the location of the genome functional annotation here",
