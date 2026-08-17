@@ -13,25 +13,15 @@ find_de_edger <- function(old_dge,
   print(batch_design)
 
   design <- model.matrix(batch_design, data = keyfile)
-  group_levels <- eval(parse(text = paste0("levels(keyfile$", group, ")")))
+  group_levels <- levels(as.factor(keyfile$sample_group))
   print(group_levels)
 
-  colnames(design)[seq_along(group_levels)] <- eval(parse(
-    text = paste0(
-      "levels(as.factor(keyfile$",
-      group,
-      "))"
-    )
-  ))
+  colnames(design)[seq_along(group_levels)] <- group_levels
 
   if (surrogate_variable) {
     print("Running SV analysis")
     dat    <- cpm(dge)
-    mod    <- eval(parse(text = paste0(
-      "model.matrix(~ ",
-      batch_design,
-      ", data = keyfile)"
-    )))
+    mod    <- model.matrix(batch_design, data = keyfile)
     mod0   <- model.matrix(~ 1, data = keyfile)
     svseq  <- sva::svaseq(dat, mod, mod0)
     print("SVseq finished")
