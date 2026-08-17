@@ -119,7 +119,7 @@ find_combined_de <-  function(keyfile,
                showWarnings = FALSE, recursive = TRUE)
   })
 
-  combos <- combn(as.data.frame(keyfile %>% distinct(group))[,1], 2)
+  combos <- combn(as.data.frame(keyfile %>% distinct(sample_group))[,1], 2)
 
   sink(file = paste0(combined_folder, "/de_genes_summary.txt"))
 
