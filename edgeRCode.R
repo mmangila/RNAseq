@@ -160,15 +160,7 @@ de_edger_tables <- function(keyfile,
                             analysis,
                             v,
                             padj) {
-  combos <- eval(
-    parse(
-      text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(as.character(",
-        group,
-        ")))[,1], 2)"
-      )
-    )
-  )
+  combos <- combn(as.data.frame(keyfile %>% distinct(sample_group))[, 1], 2)
 
   print(combos)
 
