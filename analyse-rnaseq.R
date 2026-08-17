@@ -161,8 +161,10 @@ analyse_rnaseq <-  function(project_folder,
 }
 
 create_design <- function (group, batch_vars) {
-  all_design_terms <- unlist(lapply(seq_along(batch_vars), function (size) {
-    subsets <- combn(batch_vars, size, simplify = FALSE)
+  all_vars <- c(group, batch_vars)
+  
+  all_design_terms <- unlist(lapply(seq_along(all_vars), function (size) {
+    subsets <- combn(all_vars, size, simplify = FALSE)
     design_terms <- sapply(subsets, function (x) {paste(x, collapse = ":")})
     return(design_terms)
   }))
