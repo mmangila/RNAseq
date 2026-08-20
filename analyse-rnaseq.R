@@ -74,8 +74,10 @@ analyse_rnaseq <-  function(project_folder,
   )
   colnames(keyfile)[1] <- "Sample_ID"
 
-  keyfile$sample_group <- keyfile[, group]
+  keyfile <- as.data.frame(keyfile)
 
+  keyfile$sample_group <- keyfile[, group]
+  keyfile <- as_tibble(keyfile)
   print(keyfile)
 
   if (annotation) {
