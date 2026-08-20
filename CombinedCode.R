@@ -42,8 +42,9 @@ combine_desets <-  function(combos,
 
     used_loci <- union(deseq_deset$X, edger_deset$X)
 
-    tmp_data  <- sapply(used_loci, function (gene) {
+    tmp_data  <- sapply(seq_along(used_loci), function (gene_num) {
   
+      gene        <- used_loci[gene_num]
       edger_logfc <- edger_deset[gene, "logFC"]
       deseq_logfc <- deseq_deset[gene, "log2FoldChange"]
       edger_pval  <- edger_deset[gene, "adj.P.Val"]
@@ -57,13 +58,15 @@ combine_desets <-  function(combos,
       return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
                min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)
                ))
+
+      print(paste("Processed", paste0(gene_num, "/", length(used_loci)), genes)
   })
 
   union_deset <- data.frame(X               = used_loci,
-                          Union_logFC     = tmp_data[1, ],
-                          Union_padj      = tmp_data[2, ],
-                          Intersect_logFC = tmp_data[3, ],
-                          Intersect_padj  = tmp_data[4, ])
+                            Union_logFC     = tmp_data[1, ],
+                            Union_padj      = tmp_data[2, ],
+                            Intersect_logFC = tmp_data[3, ],
+                            Intersect_padj  = tmp_data[4, ])
 
   union_deset[, func_focus] <- union_deset$X
 
