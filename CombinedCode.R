@@ -2,7 +2,7 @@ combine_desets <-  function(combos,
                             lfc_suffixes,
                             combined_folder,
                             comp_num,
-                            annotation,
+                            pval,
                             funcs,
                             func_focus,
                             paths) {
@@ -66,7 +66,7 @@ combine_desets <-  function(combos,
 
   union_deset[, func_focus] <- union_deset$X
 
-  if (annotation) {
+  if (!is.null(funcs)) {
     annotated_deset <- merge(funcs[funcs[, func_focus] %in% used_loci, ], union_deset,
                              by = func_focus)
   } else {
@@ -110,7 +110,7 @@ combine_desets <-  function(combos,
 find_combined_de <-  function(keyfile,
                               group,
                               lfc_suffixes,
-                              annotation,
+                              pval,
                               funcs,
                               func_focus,
                               paths,
@@ -133,7 +133,7 @@ find_combined_de <-  function(keyfile,
                    lfc_suffixes,
                    combined_folder,
                    comparison,
-                   annotation,
+                   pval,
                    funcs,
                    func_focus,
                    paths)
