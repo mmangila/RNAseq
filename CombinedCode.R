@@ -15,6 +15,10 @@ combine_desets <-  function(combos,
     sep = "."
   )
 
+  print(paste("Combining",
+              de_genes_summary[1], "vs",
+              de_genes_summary[2], "datasets"))
+
     edger_deset <- read.csv(paste0(
       paths[3],
       "/edgeR/DE_tables/",
@@ -87,6 +91,8 @@ combine_desets <-  function(combos,
     combined_1.5set <- combined_deset[combined_deset$logFC  < 1.5,  ]
     combined_2set   <- combined_deset[combined_deset$logFC  < 2,    ]
 
+    print(paste("Get", combo_mode, "of edgeR and DESeq2"))
+
     de_table_path <- paste(combined_folder, combo_mode, "DE_tables", test_name, sep = "/")
     dir.create(de_table_path,
                showWarnings = FALSE, recursive = TRUE)
@@ -96,6 +102,8 @@ combine_desets <-  function(combos,
       write.csv(combined_deset[combined_deset$logFC < lfc_Suffixes$Level[x], ],
                 paste(de_table_path, paste0(test_name, lfc_Suffixes$Suffix[x]), sep = "/"))
     })
+
+    print(paste(combo_mode, "found"))
   })
 }
 
