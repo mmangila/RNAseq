@@ -19,47 +19,43 @@ combine_desets <-  function(combos,
               de_genes_summary[1], "vs",
               de_genes_summary[2], "datasets"))
 
-    edger_deset <- read.csv(paste0(
-      paths[3],
-      "/edgeR/DE_tables/",
-      test_name,
-      "/",
-      test_name,
-      "_alltags.csv"
-    ))
+  print("Get edgeR dataset")
+  edger_deset <- read.csv(paste0(paths[3],
+                                 "/edgeR/DE_tables/",
+                                 test_name,
+                                 "/",
+                                 test_name,
+                                 "_alltags.csv"))
+  row.names(edger_deset) <- edger_deset$X
 
-    deseq_deset <- read.csv(paste0(
-      paths[3],
-      "/DESEQ2/DE_tables/",
-      test_name,
-      "/",
-      test_name,
-      "_alltags.csv"
-    ))
+  print("Get DESeq2 dataset")
+  deseq_deset <- read.csv(paste0(paths[3],
+                                 "/DESEQ2/DE_tables/",
+                                 test_name,
+                                 "/",
+                                 test_name,
+                                 "_alltags.csv"))
+  row.names(deseq_deset) <- deseq_deset$X
 
-    row.names(deseq_deset) <- deseq_deset$X
-    row.names(edger_deset) <- edger_deset$X
+  used_loci <- union(deseq_deset$X, edger_deset$X)
 
-    used_loci <- union(deseq_deset$X, edger_deset$X)
-
-    tmp_data  <- sapply(seq_along(used_loci), function (gene_num) {
+  tmp_data  <- sapply(seq_along(used_loci), function (gene_num) {
   
-      gene        <- used_loci[gene_num]
-      edger_logfc <- edger_deset[gene, "logFC"]
-      deseq_logfc <- deseq_deset[gene, "log2FoldChange"]
-      edger_pval  <- edger_deset[gene, "adj.P.Val"]
-      deseq_pval  <- deseq_deset[gene, "padj"]
+    gene        <- used_loci[gene_num]
+    edger_logfc <- edger_deset[gene, "logFC"]
+    deseq_logfc <- deseq_deset[gene, "log2FoldChange"]
+    edger_pval  <- edger_deset[gene, "adj.P.Val"]
+    deseq_pval  <- deseq_deset[gene, "padj"]
 
-      if (is.na(edger_logfc)) edger_logfc <- 0
-      if (is.na(deseq_logfc)) deseq_logfc <- 0
-      if (is.na(edger_pval))  edger_pval  <- 1
-      if (is.na(deseq_pval))  deseq_pval  <- 1
+    if (is.na(edger_logfc)) edger_logfc <- 0
+    if (is.na(deseq_logfc)) deseq_logfc <- 0
+    if (is.na(edger_pval))  edger_pval  <- 1
+    if (is.na(deseq_pval))  deseq_pval  <- 1
 
-      return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
-               min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)
-               ))
+    return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
+             min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)))
 
-      print(paste("Processed", paste0(gene_num, "/", length(used_loci)), genes))
+    print(paste("Processed", paste0(gene_num, "/", length(used_loci)), genes))
   })
 
   union_deset <- data.frame(X               = used_loci,
@@ -72,7 +68,7 @@ combine_desets <-  function(combos,
 
   if (annotation) {
     annotated_deset <- merge(funcs[funcs[, func_focus] %in% used_loci, ], union_deset,
-                                 by = func_focus)
+                             by = func_focus)
   } else {
     annotated_deset <- union_deset
   }
