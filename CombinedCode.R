@@ -59,7 +59,7 @@ combine_desets <-  function(combos,
                min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)
                ))
 
-      print(paste("Processed", paste0(gene_num, "/", length(used_loci)), genes)
+      print(paste("Processed", paste0(gene_num, "/", length(used_loci)), genes))
   })
 
   union_deset <- data.frame(X               = used_loci,
