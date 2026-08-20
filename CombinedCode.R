@@ -121,8 +121,6 @@ find_combined_de <-  function(keyfile,
 
   combos <- combn(as.data.frame(keyfile %>% distinct(sample_group))[,1], 2)
 
-  sink(file = paste0(combined_folder, de_combo, "de_genes_summary.txt", sep = "/"))
-
   sapply(seq_along(combos[1, ]), function (comparison) {
     combine_desets(combos,
                    lfc_suffixes,
