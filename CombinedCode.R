@@ -51,9 +51,9 @@ combine_desets <-  function(combos,
     if (is.na(edger_pval))  edger_pval  <- 1
     if (is.na(deseq_pval))  deseq_pval  <- 1
 
+    print(paste("Processed", paste0(gene_num, "/", length(used_loci)), "genes"))
     return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
              min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)))
-    print(paste("Processed", paste0(gene_num, "/", length(used_loci)), "genes"))
   })
 
   union_deset <- data.frame(X               = used_loci,
