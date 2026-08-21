@@ -158,7 +158,7 @@ analyse_rnaseq <-  function(project_folder,
 
       
       analyse_go(funcs, func_focus,
-                 project_folder, combos, paths,
+                 project_folder, combos, project_paths,
                  de_logfc, go_pval)
     }
   }
