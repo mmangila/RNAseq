@@ -84,8 +84,8 @@ combine_desets <-  function(combos,
     write.csv(combined_allset,
               paste(de_table_path, paste0(test_name, "_alltags.csv"), sep = "/"))
     sapply(seq_along(lfc_suffixes$Level), function (x) {
-      write.csv(combined_deset[combined_deset$logFC < lfc_Suffixes$Level[x], ],
-                paste(de_table_path, paste0(test_name, lfc_Suffixes$Suffix[x]), sep = "/"))
+      write.csv(combined_deset[combined_deset$logFC < lfc_suffixes$Level[x], ],
+                paste(de_table_path, paste0(test_name, lfc_suffixes$Suffix[x]), sep = "/"))
     })
 
     print(paste(combo_mode, "found"))
