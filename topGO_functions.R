@@ -196,7 +196,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
 
   geneid_to_go <- readMappings(file = paste(project_folder,
                                             paste0(project_folder,
-                                                   "_readMappings.tsv"))
+                                                   "_readMappings.tsv")))
 
   go_opts <- expand.grid(c("BP", "MF", "CC"), c("up", "down"))
 
