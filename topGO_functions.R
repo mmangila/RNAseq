@@ -9,16 +9,6 @@ analyse_topgo <- function(ontology_to_test,
                           de_logfc,
                           go_pval) {
 
-  ### args
-  # ontology_to_test = "BP"
-  # test_name = "Gall_base.vs.Ungalled_leaf"
-  # test_number = 3
-  # de_table_file = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/DE_tables/Surrounding_tissue.vs.Ungalled_leaf/Surrounding_tissue.vs.Ungalled_leaf_alltags.csv")
-  # # need a column called "model", "adj.P.Val" and "logFC"
-  # de_direction = "down"
-  # out_dir = paste0("FibrosaAlignment/FibrosaAlignment_batch1/DE_analysis_2022-05-23-1743/Combined/GO_tests/")
-  # #####
-
   dir.create(out_dir, showWarnings = FALSE)
   dir.create(paste(out_dir,
                    "genes-in-gos",
@@ -223,32 +213,33 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                       go_pval)
       })
     })
-  })
-  data_folder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
 
-  # make list of files
-  file_names <- list.files(path = data_folder, pattern = "*.csv")
+    data_folder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
 
-  # make list of file paths
-  sample_paths <- file.path(data_folder, file_names)
+    # make list of files
+    file_names <- list.files(path = data_folder, pattern = "*.csv")
+
+    # make list of file paths
+    sample_paths <- file.path(data_folder, file_names)
 
   ############ split file names to match samples to keyfile
 
-  Sample_names <- file_names %>% str_replace(".csv", "")
+    Sample_names <- file_names %>% str_replace(".csv", "")
 
-  data <- data_frame(sample = Sample_names, paths = sample_paths) %>%
-    mutate(file_contents = map(sample_paths,
-                               ~ read_csv(., col_names = TRUE)))  %>%
-    dplyr::select(-paths)
+    data <- data_frame(sample = Sample_names, paths = sample_paths) %>%
+      mutate(file_contents = map(sample_paths,
+                                 ~ read_csv(., col_names = TRUE)))  %>%
+      dplyr::select(-paths)
 
-  big_data <- unnest(data[which(!isEmpty(data$file_contents)), ],
-                     cols = c(file_contents))
+    big_data <- unnest(data[which(!isEmpty(data$file_contents)), ],
+                       cols = c(file_contents))
 
-  sapply(seq_along(combos[1, ]), function (x) {
-    map2(rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
-         go_plot_comparison,
-         test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
-         big_data   = big_data,
-         data_folder = data_folder)
+    sapply(seq_along(combos[1, ]), function (x) {
+      map2(rep(c("BP", "MF", "CC"), 2), rep(c("up", "down"), each = 3),
+           go_plot_comparison,
+           test_name  = paste0(combos[1,x], ".vs.", combos[2,x]),
+           big_data   = big_data,
+           data_folder = data_folder)
+    })
   })
 }
