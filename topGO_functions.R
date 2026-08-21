@@ -95,7 +95,7 @@ analyse_topgo <- function(ontology_to_test,
                         de_direction,
                         paste0(ontology_to_test, ".csv"),
                         sep = "_"),
-                  sep = "/")
+                  sep = "/"))
 
   print("Printing all genes in each significantly enriched GO terms.")
 
