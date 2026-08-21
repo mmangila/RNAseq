@@ -78,7 +78,7 @@ analyse_rnaseq <-  function(project_folder,
 
   keyfile$sample_group <- keyfile[, group]
   keyfile <- as_tibble(keyfile)
-  print(keyfile)
+  combos  <- combn(as.data.frame(keyfile %>% distinct(sample_group))[,1], 2)
 
   if (annotation) {
     func_path <- readline(paste(
@@ -129,6 +129,7 @@ analyse_rnaseq <-  function(project_folder,
                 surrogate_variable)
   # Find the union
   print("Combining the analyses")
+
   find_combined_de(keyfile,
                    group,
                    combos,
