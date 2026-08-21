@@ -191,12 +191,11 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
   geneDescription_GO <- geneDescription_GO %>% filter(!is.na(GOid_list))
 
   write_tsv(geneDescription_GO,
-            paste0(project_folder, "/", project_folder, "_readMappings.tsv"),
+            paste0(project_folder, "/", "genome_readMappings.tsv"),
             col_names = FALSE)
 
   geneid_to_go <- readMappings(file = paste(project_folder,
-                                            paste0(project_folder,
-                                                   "_readMappings.tsv"),
+                                            "genome_readMappings.tsv",
                                             sep = "/"))
 
   go_opts <- expand.grid(c("BP", "MF", "CC"), c("up", "down"))
