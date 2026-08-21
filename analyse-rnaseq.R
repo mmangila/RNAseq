@@ -145,7 +145,7 @@ analyse_rnaseq <-  function(project_folder,
 
   if (!is.null(funcs)) {
     print("Run GO analysis?")
-    go_choice <- readline("Yes/No")
+    go_choice <- readline("Choose Yes/No:")
 
     if (tolower(go_choice) %in% c("yes", "yeah", "ye", "yea", "y", "agree")) {
       print("Begin GO analysis")
