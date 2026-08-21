@@ -95,6 +95,7 @@ combine_desets <-  function(combos,
 
 find_combined_de <-  function(keyfile,
                               group,
+                              combos,
                               lfc_suffixes,
                               pval,
                               funcs,
@@ -111,8 +112,6 @@ find_combined_de <-  function(keyfile,
     dir.create(paste(combined_folder, de_combo, "GO_tests"),
                showWarnings = FALSE, recursive = TRUE)
   })
-
-  combos <- combn(as.data.frame(keyfile %>% distinct(sample_group))[,1], 2)
 
   sapply(seq_along(combos[1, ]), function (comparison) {
     combine_desets(combos,
