@@ -131,6 +131,7 @@ analyse_rnaseq <-  function(project_folder,
   print("Combining the analyses")
   find_combined_de(keyfile,
                    group,
+                   combos,
                    lfc_suffixes,
                    padj,
                    funcs,
