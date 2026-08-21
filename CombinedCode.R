@@ -37,36 +37,24 @@ combine_desets <-  function(combos,
                                  "_alltags.csv"))
   row.names(deseq_deset) <- deseq_deset$X
 
-  used_loci <- union(deseq_deset$X, edger_deset$X)
-  print("Processing genes")
-  tmp_data  <- sapply(seq_along(used_loci), function (gene_num) {
-    gene        <- used_loci[gene_num]
-    edger_logfc <- edger_deset[gene, "logFC"]
-    deseq_logfc <- deseq_deset[gene, "log2FoldChange"]
-    edger_pval  <- edger_deset[gene, "adj.P.Val"]
-    deseq_pval  <- deseq_deset[gene, "padj"]
-
-    if (is.na(edger_logfc)) edger_logfc <- 0
-    if (is.na(deseq_logfc)) deseq_logfc <- 0
-    if (is.na(edger_pval))  edger_pval  <- 1
-    if (is.na(deseq_pval))  deseq_pval  <- 1
-
-    print(paste("Processed", paste0(gene_num, "/", length(used_loci)), "genes"))
-    return(c(max(edger_logfc,deseq_logfc), min(edger_pval, deseq_pval),
-             min(edger_logfc,deseq_logfc), max(edger_pval, deseq_pval)))
-  })
-
-  union_deset <- data.frame(X               = used_loci,
-                            Union_logFC     = tmp_data[1, ],
-                            Union_padj      = tmp_data[2, ],
-                            Intersect_logFC = tmp_data[3, ],
-                            Intersect_padj  = tmp_data[4, ])
+  print("Processing datasets")
+  union_deset <- merge(deseq_deset, edger_deset, all = TRUE)
+  union_deset <- union_deset %>%
+    mutate(logFC           = ifelse(is.na(logFC), 0, logFC),
+           log2FoldChange  = ifelse(is.na(log2FoldChange), 0, log2FoldChange),
+           adj.P.Val       = ifelse(is.na(adj.P.Val), 1, adj.P.Val),
+           padj            = ifelse(is.na(padj), 1, padj),
+           Union_logFC     = ifelse(abs(logFC) > abs(log2FoldChange),
+                                    logFC, log2FoldChange),
+           Union_padj      = pmin(adj.P.Val, padj),
+           Intersect_logFC = ifelse(abs(logFC) < abs(log2FoldChange),
+                                    logFC, log2FoldChange),
+           Intersect_padj  = pmax(padj, adj.P.Val))
 
   union_deset[, func_focus] <- union_deset$X
 
   if (!is.null(funcs)) {
-    annotated_deset <- merge(funcs[funcs[, func_focus] %in% used_loci, ], union_deset,
-                             by = func_focus)
+    annotated_deset <- merge(funcs, union_deset)
   } else {
     annotated_deset <- union_deset
   }
