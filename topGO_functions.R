@@ -22,11 +22,11 @@ analyse_topgo <- function(ontology_to_test,
 
   if (de_direction == "up") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC > de_logfc), 1]
+      de_table[which(de_table$logFC > de_logfc), 1]
     )[, 1]
   } else if (de_direction == "down") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$edger_logFC * -1 > de_logfc), 1]
+      de_table[which(de_table$logFC * -1 > de_logfc), 1]
     )[, 1]
   } else {
     print("de direction confusion")
