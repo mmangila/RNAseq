@@ -52,14 +52,17 @@ combine_desets <-  function(combos,
            Intersect_padj  = pmax(padj, adj.P.Val))
 
   union_deset[, func_focus] <- union_deset$X
+  union_deset <- union_deset[, c(func_focus,
+                                 Union_logFC,
+                                 Intersect_logFC,
+                                 Union_padj,
+                                 Intersect_padj)]
 
   if (!is.null(funcs)) {
     annotated_deset <- merge(funcs, union_deset)
   } else {
     annotated_deset <- union_deset
   }
-
-  annotated_deset <- annotated_deset[, colnames(annotated_deset) != "X"]
 
   sapply(c("Union", "Intersect"), function (combo_mode) {
   
