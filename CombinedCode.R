@@ -53,10 +53,10 @@ combine_desets <-  function(combos,
 
   union_deset[, func_focus] <- union_deset$X
   union_deset <- union_deset[, c(func_focus,
-                                 Union_logFC,
-                                 Intersect_logFC,
-                                 Union_padj,
-                                 Intersect_padj)]
+                                 "Union_logFC",
+                                 "Intersect_logFC",
+                                 "Union_padj",
+                                 "Intersect_padj")]
 
   if (!is.null(funcs)) {
     annotated_deset <- merge(funcs, union_deset)
