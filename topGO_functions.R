@@ -22,11 +22,11 @@ analyse_topgo <- function(ontology_to_test,
 
   if (de_direction == "up") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$logFC > de_logfc), 1]
+      de_table[which(de_table$logFC > de_logfc), func_focus]
     )[, 1]
   } else if (de_direction == "down") {
     de_locus <- as.data.frame(
-      de_table[which(de_table$logFC * -1 > de_logfc), 1]
+      de_table[which(de_table$logFC * -1 > de_logfc), func_focus]
     )[, 1]
   } else {
     print("de direction confusion")
@@ -190,9 +190,17 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
 
   go_opts <- expand.grid(c("BP", "MF", "CC"), c("up", "down"))
 
-  sapply(c("Union", "Intersect"), function (de_combo) {
-    sapply(seq_along(combos[1, ]), function (x) {
-      sapply(seq_along(go_opts[, 1]), function (y) {
+  
+    
+  sapply(seq_along(combos[1, ]), function (x) {
+    sapply(seq_along(go_opts[, 1]), function (y) {
+      print(paste("Analysing", go_opts[y, 2], "GO terms enriched in genes",
+                  paste0(go_opts[y, 2], "regulated in"),
+                  combos[1, x], "compared to", paste0(combos[2, x], "."))
+      sapply(c("Union", "Intersect"), function (de_combo) {
+
+        print(paste("edgeR + DESeq2 combination mode:", de_combo))
+        
         analyse_topgo(as.character(go_opts[y, 1]),
                       as.character(go_opts[y, 2]),
                       paste0(combos[1, x], ".vs.", combos[2, x]),
