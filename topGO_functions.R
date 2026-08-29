@@ -196,7 +196,7 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
     sapply(seq_along(go_opts[, 1]), function (y) {
       print(paste("Analysing", go_opts[y, 2], "GO terms enriched in genes",
                   paste0(go_opts[y, 2], "regulated in"),
-                  combos[1, x], "compared to", paste0(combos[2, x], "."))
+                  combos[1, x], "compared to", paste0(combos[2, x], ".")))
       sapply(c("Union", "Intersect"), function (de_combo) {
 
         print(paste("edgeR + DESeq2 combination mode:", de_combo))
