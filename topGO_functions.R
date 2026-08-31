@@ -102,7 +102,7 @@ analyse_topgo <- function(ontology_to_test,
                     paste(test_name,
                           de_direction,
                           go_term,
-                          "genes.csv")))
+                          "genes.csv", sep = "_"), sep = "/"))
   })
 
   #### Make graphs
