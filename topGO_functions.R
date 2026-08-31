@@ -223,8 +223,10 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
                       go_pval)
       })
     })
-
-    data_folder <- file.path(paste0(project_paths[3], "/Combined/GO_tests/"))   # path to the data
+    
+    sapply(c("Union", "Intersect"), function (de_combo) {
+    
+    data_folder <- file.path(paste(project_paths[3], "Combined", de_combo, "GO_tests", sep = "/"))   # path to the data
 
     # make list of files
     file_names <- list.files(path = data_folder, pattern = "*.csv")
@@ -251,5 +253,6 @@ analyse_go <- function (funcs, func_focus, project_folder, combos, project_paths
            big_data   = big_data,
            data_folder = data_folder)
     })
+  })
   })
 }
