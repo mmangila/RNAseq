@@ -107,8 +107,11 @@ analyse_topgo <- function(ontology_to_test,
 
   #### Make graphs
   print("Making GO graphs")
-  result_ks <- runTest(go_data, algorithm = "elim",    statistic = "ks")
+  try(create_nodegraph(go_data, test_name, de_direction, ontology_to_test, result_fisher))
+}
 
+create_nodegraph <- function (go_data, test_name, de_direction, ontology_to_test, result_fisher) {
+  result_ks <- runTest(go_data, algorithm = "elim", statistic = "ks")
   node_path <- paste(out_dir,
                      paste(test_name,
                            de_direction,
