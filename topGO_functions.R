@@ -101,6 +101,9 @@ analyse_topgo <- function(ontology_to_test,
                     ontology_to_test,
                     paste(test_name,
                           de_direction,
+                          go_term, sep = "_"),
+                    paste(test_name,
+                          de_direction,
                           go_term,
                           "genes.csv", sep = "_"), sep = "/"))
   })
