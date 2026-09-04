@@ -12,17 +12,16 @@ find_de_deseq <- function(dge_deseq,
     dge_deseq$counts
   )
 
-  dds <- eval(parse(text = paste0(
-    "DESeqDataSetFromMatrix(",
-    "countData = dge_deseq$counts,",
-    "colData   = keyfile,",
-    "design    = ~ 1 + ",
-    batch_design, ")"
-  )))
+  dds <- DESeqDataSetFromMatrix(countData = dge_deseq$counts,
+                                colData   = keyfile,
+                                design    = batch_design)
+
+  print("Estimating size factors")
 
   dds <- estimateSizeFactors(dds)
 
   if (surrogate_variable) {
+    print("Running SVAseq")
     print(paste0(
       "model.matrix(~ 1 + ",
       batch_design,
@@ -38,8 +37,20 @@ find_de_deseq <- function(dge_deseq,
     mod0 <- model.matrix(~ 1, colData(dds))
 
     svs <- sva::num.sv(dat, mod, method = "leek")
+    svseq <- run_svaseq(dat, mod, mod0, svs)
 
-    svseq <- sva::svaseq(dat, mod, mod0, n.sv = svs - 1)
+    if(svseq == 0) {
+      print("Run again without SVAseq")
+      find_de_deseq(dge_deseq,
+                    keyfile,
+                    group,
+                    batch_design,
+                    padj,
+                    paths,
+                    fc_shrink,
+                    surrogate_variable = FALSE)
+    }
+
     ddssva <- dds
 
     sapply(seq_along(svseq[1, ]), function(sv) {
@@ -50,14 +61,15 @@ find_de_deseq <- function(dge_deseq,
         sv
       )))
     })
-    ddssva$SV1 <- svseq$sv[, 1]
-    ddssva$SV2 <- svseq$sv[, 2]
+
     design(ddssva) <- eval(parse(text = paste("~",
                                               paste0("SV", 1:(svs - 1),
                                                      collapse = " + "),
                                               "+", group)))
     dds <- ddssva
   }
+
+  print("Run DESeq2")
 
   dds <- DESeq2::DESeq(dds)
 
@@ -75,9 +87,9 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
   combos <- eval(
     parse(
       text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(",
+        "combn(as.data.frame(keyfile %>% distinct(as.character(",
         group,
-        "))[,1],2)"
+        ")))[,1], 2)"
       )
     )
   )
@@ -93,12 +105,18 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                "_detags_2FC.csv")
   )
 
+  print(lfc_suffixes)
+
   sapply(seq_along(combos[1, ]), function(x) {
+
     test_name <- paste0(
       combos[1, x],
       ".vs.",
       combos[2, x]
     )
+
+    print(paste0("Begin ", test_name))
+
     test_base_dir <- paste0(out_base,
                             test_name,
                             "/")
@@ -106,16 +124,16 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
     de_genes  <- results(
       dds,
       contrast = c(group,
-                   as.character(combos[2, x]),
-                   as.character(combos[1, x])),
+                   as.character(combos[1, x]),
+                   as.character(combos[2, x])),
       alpha = 0.99999
     )
 
     if (fc_shrink == TRUE) {
       de_genes <- lfc_shrink(dds,
                              contrast = c(group,
-                                          as.character(combos[2, x]),
-                                          as.character(combos[1, x])),
+                                          as.character(combos[1, x]),
+                                          as.character(combos[2, x])),
                              res      = de_genes,
                              type     = "ashr")
     }
@@ -125,7 +143,7 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
               file = paste0(test_base_dir,
                             test_name,
                             "_alltags.csv"))
-
+    print("Creating volcano plot")
     pdf(paste0(test_base_dir,test_name,"_volcano.pdf"), width = 5, height = 3.5)
     print(EnhancedVolcano(de_genes,
                           lab = rownames(de_genes),
@@ -133,17 +151,21 @@ de_deseq_tables <- function(keyfile, group, dds, padj, paths, fc_shrink) {
                           y = "pvalue"))
     dev.off()
 
-    sapply(1:3, function(x) {
+    print("Write significantly DE genes to tables")
+
+    sapply(seq_along(lfc_suffixes$Level), function(lvl) {
+      print(paste("Get significantly DE genes above", lfc_suffixes$Level[lvl], "FC"))
       de_genes_sigs <- filter_de_set(
         de_genes,
-        lfc_suffixes[x, 1],
+        lfc_suffixes$Level[lvl],
         padj
       )
       write_csv(as.data.frame(de_genes_sigs),
                 file = paste0(test_base_dir,
                               test_name,
-                              lfc_suffixes[x, 2]))
+                              lfc_suffixes$Suffix[lvl]))
     })
+    print(paste("Finished", test_name))
   })
 }
 
@@ -192,4 +214,24 @@ filter_de_set <- function(deset, lfc = 0, padj = 0.05) {
   ]
 
   return(filtered_de_set)
+}
+
+run_svaseq <- function (dat, mod, mod0, svs) {
+  if(svs == 0) {
+    t <- 0
+  } else {
+    t <- try(sva::svaseq(dat, mod, mod0, n.sv = svs))
+  }
+  if("try-error" %in% class(t)) t <- run_svaseq(dat, mod, mod0, svs - 1)
+  return(t)
+}
+
+perm <- function(v) {
+  n <- length(v)
+  if (n == 1) v
+  else {
+    X <- NULL
+    for (i in 1:n) X <- rbind(X, cbind(v[i], perm(v[-i])))
+    X
+  }
 }

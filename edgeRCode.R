@@ -12,31 +12,16 @@ find_de_edger <- function(old_dge,
 
   print(batch_design)
 
-  design <- eval(parse(text = paste0(
-    "model.matrix(~ 0 + ",
-    batch_design,
-    ", data = keyfile)"
-  )))
-
-  group_levels <- eval(parse(text = paste0("levels(keyfile$", group, ")")))
+  design <- model.matrix(batch_design, data = keyfile)
+  group_levels <- levels(as.factor(keyfile$sample_group))
   print(group_levels)
 
-  colnames(design)[seq_along(group_levels)] <- eval(parse(
-    text = paste0(
-      "levels(as.factor(keyfile$",
-      group,
-      "))"
-    )
-  ))
+  colnames(design)[seq_along(group_levels)] <- group_levels
 
   if (surrogate_variable) {
     print("Running SV analysis")
     dat    <- cpm(dge)
-    mod    <- eval(parse(text = paste0(
-      "model.matrix(~ ",
-      batch_design,
-      ", data = keyfile)"
-    )))
+    mod    <- model.matrix(batch_design, data = keyfile)
     mod0   <- model.matrix(~ 1, data = keyfile)
     svseq  <- sva::svaseq(dat, mod, mod0)
     print("SVseq finished")
@@ -175,15 +160,9 @@ de_edger_tables <- function(keyfile,
                             analysis,
                             v,
                             padj) {
-  combos <- eval(
-    parse(
-      text = paste0(
-        "combn(as.data.frame(keyfile %>% distinct(",
-        group,
-        "))[,1],2)"
-      )
-    )
-  )
+  combos <- combn(as.data.frame(keyfile %>% distinct(sample_group))[, 1], 2)
+
+  print(combos)
 
   inside <- vector(mode = "character")
   inside2 <- sapply(seq_along(combos[1, ]), function(x) {
@@ -799,4 +778,15 @@ make_PCA_plots_large_labels <- function (dot_colour,
     ) +
     coord_equal()
   print(g)
+}
+
+
+perm <- function(v) {
+  n <- length(v)
+  if (n == 1) v
+  else {
+    X <- NULL
+    for (i in 1:n) X <- rbind(X, cbind(v[i], perm(v[-i])))
+    X
+  }
 }
