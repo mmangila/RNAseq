@@ -178,7 +178,7 @@ filter_wrapper <-  function(keyfile,
 
   if (!is.null(funcs)) {
   gene_match <- match(row.names(dge$counts),
-                        funcs[, which(colnames(funcs) == func_focus)])
+                        funcs[, func_focus])
   gene_description_matched <- funcs[gene_match, ]
 
   dge$genes <- gene_description_matched
