@@ -275,7 +275,7 @@ de_edger_tables <- function(keyfile,
     MAplotGeneSetLimma(
       fit2,
       results_2fc,
-      comparison, paste0("Up-regulated genes (2FC)", comparison)
+      comparison, paste0("Up-regulated genes (2FC)", comparison),
       comparison,
       comparison
     )
