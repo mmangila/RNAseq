@@ -256,34 +256,28 @@ de_edger_tables <- function(keyfile,
 
     pdf(paste0(test_base_dir, test_name, "_smear.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject  = fit2,
-      resultsMatrix   = results,
-      geneSetList     = comparison,
-      geneSetListName = comparison,
-      inputList       = comparison,
-      inputListName   = paste0("Up-regulated genes", comparison)
+      fit2,
+      results, comparison, paste0("Up-regulated genes", comparison), comparison, comparison
     )
     dev.off()
 
     pdf(paste0(test_base_dir, test_name, "_smear1point5FC.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject  = fit2,
-      resultsMatrix   = results_1point5_fc,
-      geneSetList     = comparison,
-      geneSetListName = comparison,
-      inputList       = comparison,
-      inputListName   = paste0("Up-regulated genes (1.5FC)", comparison)
+      fit2,
+      results_1point5_fc,
+      comparison, paste0("Up-regulated genes (1.5FC)", comparison), 
+      comparison,
+      comparison
     )
     dev.off()
 
     pdf(paste0(test_base_dir, test_name, "_smear2FC.pdf"))
     MAplotGeneSetLimma(
-      MArrayLMobject  = fit2,
-      resultsMatrix   = results_2fc,
-      geneSetList     = comparison,
-      geneSetListName = comparison,
-      inputList       = comparison,
-      inputListName   = paste0("Up-regulated genes (2FC)", comparison)
+      fit2,
+      results_2fc,
+      comparison, paste0("Up-regulated genes (2FC)", comparison)
+      comparison,
+      comparison
     )
     dev.off()
 
