@@ -183,9 +183,9 @@ create_design <- function (group, batch_vars) {
 
 read_files <- function (file_to_read) {
   if (grepl(".tsv", file_to_read)) {
-      funcs <- read.table(file_to_read, sep = "\t", header = TRUE)
+      funcs <- read_tsv(file_to_read)
     } else if (grepl(".csv", file_to_read)) {
-      funcs <- read.csv(file = file_to_read)
+      funcs <- read_csv(file = file_to_read)
     } else {
       warning("File format not recognised. Continuing without annotation.")
     }
