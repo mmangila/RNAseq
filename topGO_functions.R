@@ -22,7 +22,6 @@ analyse_topgo <- function(ontology_to_test,
              showWarnings = FALSE, recursive = TRUE)
   
   alltags_table <- as.data.frame(read_csv(alltag_table_file))
-  rownames(alltags_table) <- alltags_table %>% pull(func_focus)
   de_table      <- alltags_table[which(alltags_table$padj < 0.05), ]
   gene_universe <- alltags_table %>% pull(func_focus)
 
@@ -97,10 +96,12 @@ analyse_topgo <- function(ontology_to_test,
 
   sapply(sig_res_fdr$GO.ID, function(go_term) {
     go_genes    <- genesInTerm(go_data, go_term)
-    de_go_genes <- go_genes[[1]][go_genes[[1]] %in% de_locus]
+    all_go_genes <- go_genes[[1]]
+    de_go_genes <- all_go_genes[all_go_genes %in% de_locus]
     print(paste0("Getting genes for ", go_term))
-    go_table <- alltags_table[de_go_genes, ]
-    go_all_table <- alltags_table[go_genes, ]
+    print(de_go_genes)
+    go_table     <- alltags_table[alltags_table[, func_focus] %in% de_go_genes, ]
+    go_all_table <- alltags_table[alltags_table[, func_focus] %in% all_go_genes, ]
     
     
     write.csv(go_table,
