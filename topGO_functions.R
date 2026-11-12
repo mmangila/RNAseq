@@ -11,7 +11,12 @@ analyse_topgo <- function(ontology_to_test,
 
   dir.create(out_dir, showWarnings = FALSE)
   dir.create(paste(out_dir,
-                   "genes-in-gos",
+                   "genes-in-gos/all_genes",
+                   ontology_to_test,
+                   paste(test_name, de_direction, "GO", sep = "_"), sep = "/"),
+             showWarnings = FALSE, recursive = TRUE)
+  dir.create(paste(out_dir,
+                   "genes-in-gos/de_genes",
                    ontology_to_test,
                    paste(test_name, de_direction, "GO", sep = "_"), sep = "/"),
              showWarnings = FALSE, recursive = TRUE)
@@ -88,8 +93,6 @@ analyse_topgo <- function(ontology_to_test,
                   sep = "/"))
 
   print("Printing all genes in each significantly enriched GO terms.")
-  dir.create(paste(out_dir, "gene-in-gos/de_genes", sep = "/"))
-  dir.create(paste(out_dir, "gene-in-gos/all_genes", sep = "/"))
 
   sapply(sig_res_fdr$GO.ID, function(go_term) {
     go_genes    <- genesInTerm(go_data, go_term)
