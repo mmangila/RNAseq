@@ -21,7 +21,7 @@ analyse_topgo <- function(ontology_to_test,
                    paste(test_name, de_direction, "GO", sep = "_"), sep = "/"),
              showWarnings = FALSE, recursive = TRUE)
   
-  alltags_table <- read_csv(alltag_table_file)
+  alltags_table <- as.data.frame(read_csv(alltag_table_file))
   de_table      <- alltags_table[which(alltags_table$padj < 0.05), ]
   gene_universe <- alltags_table %>% pull(func_focus)
 
